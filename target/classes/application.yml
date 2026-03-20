@@ -1,0 +1,43 @@
+# 服务端口（可自定义，如8080/9090）
+server:
+  port: 8080
+  servlet:
+    context-path: /monitor # 接口前缀，毕设可选
+
+# 数据库连接配置
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource # 连接池
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL8.x驱动（5.x是com.mysql.jdbc.Driver）
+    url: jdbc:mysql://localhost:3306/monitor_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root # 你的MySQL用户名
+    password: 123456 # 你的MySQL密码
+    # 连接池参数（毕设可选，默认即可）
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 300000
+      pool-name: MonitorHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  # 若用JPA，需加此配置（MyBatis-Plus无需）
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update # 自动建表/更新表结构
+  #   show-sql: true
+  #   properties:
+  #     hibernate:
+  #       format_sql: true
+
+# MyBatis-Plus配置（核心，适配你的表结构）
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true # 下划线转驼峰（如user_id -> userId，适配你的表字段）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志，毕设调试用
+  global-config:
+    db-config:
+      id-type: AUTO # 主键自增（你的所有表都是自增主键，必须配）
+      table-prefix: t_ # 若你的表加前缀t_则配，无则注释（如用户表t_user，无则直接用user）
+  mapper-locations: classpath:mapper/*.xml # Mapper.xml文件路径，毕设可选（纯注解开发可省略）
