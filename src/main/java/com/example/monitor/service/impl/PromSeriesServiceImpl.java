@@ -1,15 +1,11 @@
 package com.example.monitor.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Throwables;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import com.example.monitor.entity.prometheus.PromSeries;
-import com.example.monitor.entity.prometheus.PromQueryData;
-import com.example.monitor.entity.prometheus.PromQueryResponse;
-import com.example.monitor.service.PromSeriesService;
 import com.example.monitor.utils.RestTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
