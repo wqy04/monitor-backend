@@ -34,10 +34,10 @@ spring:
 # MyBatis-Plus配置（核心，适配你的表结构）
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true # 下划线转驼峰（如user_id -> userId，适配你的表字段）
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志，毕设调试用
+    map-underscore-to-camel-case: true 
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl 
   global-config:
     db-config:
-      id-type: AUTO # 主键自增（你的所有表都是自增主键，必须配）
-      table-prefix: t_ # 若你的表加前缀t_则配，无则注释（如用户表t_user，无则直接用user）
-  mapper-locations: classpath:mapper/*.xml # Mapper.xml文件路径，毕设可选（纯注解开发可省略）
+      id-type: AUTO 
+      # table-prefix: t_ # 注释掉，因为数据库表无t_前缀
+  mapper-locations: classpath:mapper/*.xml 
