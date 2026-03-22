@@ -16,6 +16,6 @@ public class JobSchedulerServiceImpl extends ServiceImpl<JobSchedulerMapper, Job
     @Override
     public JobScheduler getJobSchedulerById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<JobScheduler>()
-                .eq(JobScheduler::getId, id));
+                .eq(JobScheduler::getSchedulerId, id));
     }
 }

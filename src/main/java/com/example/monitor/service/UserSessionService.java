@@ -8,5 +8,5 @@ import com.example.monitor.entity.UserSession;
  */
 public interface UserSessionService extends IService<UserSession> {
     // 可扩展自定义业务方法，例如：根据会话ID查询用户会话信息
-    UserSession getUserSessionById(Long id);
+    UserSession getUserSessionById(String id);
 }

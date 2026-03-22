@@ -16,6 +16,6 @@ public class ClusterServiceImpl extends ServiceImpl<ClusterMapper, Cluster> impl
     @Override
     public Cluster getClusterById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<Cluster>()
-                .eq(Cluster::getId, id));
+                .eq(Cluster::getClusterId, id));
     }
 }

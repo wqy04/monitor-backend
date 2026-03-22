@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("alarm_info")
-private class AlarmInfo {
+public class AlarmInfo {
     @TableId(type = IdType.AUTO)
     private Long id;
 

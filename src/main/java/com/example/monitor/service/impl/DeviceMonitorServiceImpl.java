@@ -16,6 +16,6 @@ public class DeviceMonitorServiceImpl extends ServiceImpl<DeviceMonitorMapper, D
     @Override
     public DeviceMonitor getDeviceMonitorById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<DeviceMonitor>()
-                .eq(DeviceMonitor::getId, id));
+                .eq(DeviceMonitor::getDeviceId, id));
     }
 }

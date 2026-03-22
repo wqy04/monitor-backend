@@ -2,7 +2,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /monitor # 接口前缀，毕设可选
+    context-path: /monitor # 接口前缀
 
 # 数据库连接配置
 spring:
@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL8.x驱动（5.x是com.mysql.jdbc.Driver）
     url: jdbc:mysql://localhost:3306/monitor_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root # 你的MySQL用户名
-    password: 123456 # 你的MySQL密码
+    password: 040404 # 你的MySQL密码
     # 连接池参数（毕设可选，默认即可）
     hikari:
       minimum-idle: 5
@@ -41,3 +41,6 @@ mybatis-plus:
       id-type: AUTO 
       # table-prefix: t_ # 注释掉，因为数据库表无t_前缀
   mapper-locations: classpath:mapper/*.xml 
+
+prometheus:
+  url: http://prometheus-server:9090

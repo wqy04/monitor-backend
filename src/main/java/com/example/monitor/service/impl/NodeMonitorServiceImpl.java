@@ -16,6 +16,6 @@ public class NodeMonitorServiceImpl extends ServiceImpl<NodeMonitorMapper, NodeM
     @Override
     public NodeMonitor getNodeMonitorById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<NodeMonitor>()
-                .eq(NodeMonitor::getId, id));
+                .eq(NodeMonitor::getNodeId, id));
     }
 }

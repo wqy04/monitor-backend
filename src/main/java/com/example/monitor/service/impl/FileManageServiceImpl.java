@@ -16,6 +16,6 @@ public class FileManageServiceImpl extends ServiceImpl<FileManageMapper, FileMan
     @Override
     public FileManage getFileManageById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<FileManage>()
-                .eq(FileManage::getId, id));
+                .eq(FileManage::getFileId, id));
     }
 }

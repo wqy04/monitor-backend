@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 public class UserSessionServiceImpl extends ServiceImpl<UserSessionMapper, UserSession> implements UserSessionService {
 
     @Override
-    public UserSession getUserSessionById(Long id) {
+    public UserSession getUserSessionById(String id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<UserSession>()
-                .eq(UserSession::getId, id));
+                .eq(UserSession::getSessionId, id));
     }
 }

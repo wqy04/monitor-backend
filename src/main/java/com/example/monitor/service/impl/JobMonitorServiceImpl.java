@@ -16,6 +16,6 @@ public class JobMonitorServiceImpl extends ServiceImpl<JobMonitorMapper, JobMoni
     @Override
     public JobMonitor getJobMonitorById(Long id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<JobMonitor>()
-                .eq(JobMonitor::getId, id));
+                .eq(JobMonitor::getJobId, id));
     }
 }
