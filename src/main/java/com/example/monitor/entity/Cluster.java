@@ -7,16 +7,16 @@ import lombok.Data;
 
 /**
  * 集群表实体
- * 对应数据库表：cluster
+ * 对应数据库表：clusters
  */
 @Data
-@TableName("cluster")
+@TableName("clusters")
 public class Cluster {
     /**
-     * 唯一主键，自增
+     * 集群ID，主键
      */
     @TableId(type = IdType.AUTO)
-    private Long clusterId;
+    private Integer clusterId;
 
     /**
      * 集群名称

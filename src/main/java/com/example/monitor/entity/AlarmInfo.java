@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 /**
  * 告警信息表实体
- * 对应数据库表：alarm_info
+ * 对应数据库表：alerts
  */
 @Data
-@TableName("alarm_info")
+@TableName("alerts")
 public class AlarmInfo {
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 告警消息内容
@@ -32,12 +32,12 @@ public class AlarmInfo {
     private String target;
 
     /**
-     * 告警级别：0/1/2/3
+     * 告警级别：0-1-2-3，四级
      */
     private Integer level;
 
     /**
-     * 处理状态：0-未解决 1-已确认 2-已解决
+     * 处理状态：0-未解决，1-已确认，2-已解决
      */
     private Integer status;
 }

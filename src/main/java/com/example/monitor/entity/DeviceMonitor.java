@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 
 /**
  * 设备监控表实体
- * 对应数据库表：device_monitor
+ * 对应数据库表：devices
  */
 @Data
-@TableName("device_monitor")
+@TableName("devices")
 public class DeviceMonitor {
     @TableId(type = IdType.AUTO)
-    private Long deviceId;
+    private Integer deviceId;
 
     /**
      * 设备名称
@@ -32,12 +32,12 @@ public class DeviceMonitor {
     private String deviceIp;
 
     /**
-     * 状态：0-离线 1-在线
+     * 设备状态：0-离线，1-在线
      */
     private Integer status;
 
     /**
-     * 最近采集时间
+     * 最近数据采集时间
      */
     private LocalDateTime lastUpdate;
 
@@ -49,10 +49,10 @@ public class DeviceMonitor {
     /**
      * 所属集群ID
      */
-    private Long clusterId;
+    private Integer clusterId;
 
     /**
-     * 外部监控链接
+     * 外部监控系统链接
      */
     private String monitorUrl;
 }

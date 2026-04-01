@@ -13,6 +13,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\NodeMonitorServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\PromQueryServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\prometheus\PromQueryData.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\AlertRule.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\AlarmInfoMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\prometheus\PromQueryRange.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\FileManageMapper.java

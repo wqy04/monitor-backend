@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 
 /**
  * 用户-会话表实体
- * 对应数据库表：user_session
+ * 对应数据库表：user_sessions
  */
 @Data
-@TableName("user_session")
+@TableName("user_sessions")
 public class UserSession {
     /**
      * 会话ID，主键
@@ -19,17 +19,17 @@ public class UserSession {
     private String sessionId;
 
     /**
-     * 关联用户ID
+     * 用户ID
      */
-    private Long userId;
+    private Integer userId;
 
     /**
-     * 关联节点ID
+     * 登录节点ID
      */
-    private Long nodeId;
+    private Integer nodeId;
 
     /**
-     * 登入时间
+     * 登录时间
      */
     private LocalDateTime loginTime;
 
@@ -39,7 +39,7 @@ public class UserSession {
     private LocalDateTime logoutTime;
 
     /**
-     * 状态：0-离线 1-在线
+     * 会话状态：0-离线，1-在线
      */
     private Integer status;
 }

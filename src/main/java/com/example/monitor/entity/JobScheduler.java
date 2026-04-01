@@ -7,13 +7,13 @@ import lombok.Data;
 
 /**
  * 作业调度器表实体
- * 对应数据库表：job_scheduler
+ * 对应数据库表：job_schedulers
  */
 @Data
-@TableName("job_scheduler")
+@TableName("job_schedulers")
 public class JobScheduler {
     @TableId(type = IdType.AUTO)
-    private Long schedulerId;
+    private Integer schedulerId;
 
     /**
      * 作业调度器名称
@@ -21,7 +21,7 @@ public class JobScheduler {
     private String schedulerName;
 
     /**
-     * 状态：0-运行中 1-未启用 2-停止中
+     * 状态：0-运行中，1-未启用，2-停止中
      */
     private Integer status;
 
@@ -31,12 +31,12 @@ public class JobScheduler {
     private Integer port;
 
     /**
-     * 连接密钥/认证方式
+     * 认证方式/密钥
      */
     private String authType;
 
     /**
      * 所属集群ID
      */
-    private Long clusterId;
+    private Integer clusterId;
 }

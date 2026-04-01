@@ -7,14 +7,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 节点监控数据表（静态）
- * 对应数据库表：node_monitor
+ * 节点监控数据表（静态数据）
+ * 对应数据库表：nodes
  */
 @Data
-@TableName("node_monitor")
+@TableName("nodes")
 public class NodeMonitor {
     @TableId(type = IdType.AUTO)
-    private Long nodeId;
+    private Integer nodeId;
 
     /**
      * 节点名
@@ -32,11 +32,6 @@ public class NodeMonitor {
     private String partition;
 
     /**
-     * 状态：0-离线 1-在线
-     */
-    private Integer status;
-
-    /**
      * 总CPU核心数
      */
     private Integer cpuTotal;
@@ -44,17 +39,12 @@ public class NodeMonitor {
     /**
      * 总内存（MB）
      */
-    private Long memoryTotal;
+    private Integer memoryTotal;
 
     /**
      * 总磁盘空间（MB）
      */
-    private Long diskTotal;
-
-    /**
-     * 最后更新时间
-     */
-    private LocalDateTime lastUpdate;
+    private Integer diskTotal;
 
     /**
      * 节点角色：0-登录节点 1-计算节点 2-存储节点
@@ -79,15 +69,15 @@ public class NodeMonitor {
     /**
      * GPU总显存（MB）
      */
-    private Long gpuMemoryTotal;
+    private Integer gpuMemoryTotal;
 
     /**
      * 所属集群ID
      */
-    private Long clusterId;
+    private Integer clusterId;
 
     /**
-     * IPMI专用IP
+     * IPMI专用IP地址
      */
     private String ipmiIP;
 
@@ -102,12 +92,12 @@ public class NodeMonitor {
     private String ipmiPassword;
 
     /**
-     * 是否允许功耗采集：0-否 1-是
+     * 是否支持功耗采集：0-否，1-是
      */
     private Boolean powerSupported;
 
     /**
-     * Prometheus metric名称
+     * Prometheus功耗指标名称
      */
     private String powerMetricName;
 }

@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 
 /**
  * 用户表实体
- * 对应数据库表：user
+ * 对应数据库表：users
  */
 @Data // Lombok注解，自动生成get/set/toString，毕设必加（简化代码）
-@TableName("user") // 指定数据库表名
+@TableName("users") // 指定数据库表名
 public class User {
     /**
-     * 唯一主键，自增
+     * 用户ID，主键
      */
     @TableId(type = IdType.AUTO) // 主键自增，和配置文件一致
-    private Long userId;
+    private Integer userId;
 
     /**
      * 用户名

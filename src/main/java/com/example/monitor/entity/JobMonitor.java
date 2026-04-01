@@ -4,17 +4,18 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * 作业监控数据表
- * 对应数据库表：job_monitor
+ * 对应数据库表：jobs
  */
 @Data
-@TableName("job_monitor")
+@TableName("jobs")
 public class JobMonitor {
     @TableId(type = IdType.AUTO)
-    private Long jobId;
+    private Integer jobId;
 
     /**
      * 作业名称
@@ -27,7 +28,7 @@ public class JobMonitor {
     private String queue;
 
     /**
-     * 队列名称/分区
+     * 队列名称（或分区）
      */
     private String partition;
 
@@ -44,22 +45,22 @@ public class JobMonitor {
     /**
      * 调度器ID
      */
-    private Long schedulerId;
+    private Integer schedulerId;
 
     /**
      * 调度器生成的作业ID
      */
-    private Long externalJobId;
+    private Integer externalJobId;
 
     /**
      * 运行集群ID
      */
-    private Long clusterId;
+    private Integer clusterId;
 
     /**
-     * 关联用户ID
+     * 提交用户ID
      */
-    private Long userId;
+    private Integer userId;
 
     /**
      * 提交时间
@@ -99,7 +100,7 @@ public class JobMonitor {
     /**
      * CPU核时
      */
-    private Integer cpuCoresHours;
+    private BigDecimal cpuCoresHours;
 
     /**
      * 申请GPU核数
@@ -107,14 +108,14 @@ public class JobMonitor {
     private Integer gpuCores;
 
     /**
-     * GPU型号
+     * 申请GPU型号
      */
     private String gpuModel;
 
     /**
      * GPU核时
      */
-    private Integer gpuCoresHours;
+    private BigDecimal gpuCoresHours;
 
     /**
      * 应用软件名称
