@@ -54,7 +54,7 @@ public class AlertController {
         return Result.ok("更新成功", null);
     }
 
-    @GetMapping("/alerts/rules")
+    @GetMapping("/alerts-rules/rules")
     public Result<List<AlertRule>> listAlertRules() {
         List<AlertRule> rules = alertRuleService.list();
         return Result.ok(rules);
