@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/monitor/api")
+@RequestMapping("/api")
 public class AlertController {
 
     @Autowired

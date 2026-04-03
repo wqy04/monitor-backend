@@ -13,7 +13,7 @@ import java.util.List;
  * 用户接口控制器
  */
 @RestController
-@RequestMapping("/monitor/user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/monitor/api")
+@RequestMapping("/api")
 public class JobController {
 
     @Autowired

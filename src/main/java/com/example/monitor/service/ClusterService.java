@@ -8,5 +8,5 @@ import com.example.monitor.entity.Cluster;
  */
 public interface ClusterService extends IService<Cluster> {
     // 可扩展自定义业务方法，例如：根据集群ID查询集群信息
-    Cluster getClusterById(Long id);
+    Cluster getByClusterName(String clusterName);
 }

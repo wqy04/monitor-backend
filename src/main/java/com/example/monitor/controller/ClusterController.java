@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/monitor/api")
+@RequestMapping("/api")
 public class ClusterController {
 
     @Autowired
