@@ -6,6 +6,7 @@ import com.example.monitor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
@@ -45,14 +46,15 @@ public class AuthController {
     }
 
     @GetMapping("/current-user")
-    public Result<User> getCurrentUser(@RequestParam("id") Integer userId) {
+    public Result<User> getCurrentUser(HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("currentUserId");
         return authService.getCurrentUser(userId);
     }
 
-    @PutMapping("/password")
+    @PostMapping("/password")
     public Result<Map<String, Object>> updatePassword(@RequestBody Map<String, Object> body) {
-        Integer userId = body.get("id") == null ? null : Integer.parseInt(body.get("id").toString());
+        String username = body.get("username") == null ? null : body.get("username").toString();
         String password = (String) body.get("password");
-        return authService.updatePassword(userId, password);
+        return authService.updatePassword(username, password);
     }
 }

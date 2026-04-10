@@ -10,5 +10,5 @@ public interface AuthService {
     Result<Map<String, Object>> refreshToken(String refreshToken);
     Result<Void> logout(String accessToken, String refreshToken);
     Result<User> getCurrentUser(Integer userId);
-    Result<Map<String, Object>> updatePassword(Integer userId, String password);
+    Result<Map<String, Object>> updatePassword(String username, String password);
 }

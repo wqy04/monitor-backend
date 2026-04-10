@@ -46,6 +46,7 @@ com\example\monitor\controller\ClusterController.class
 com\example\monitor\entity\DeviceMonitor.class
 com\example\monitor\mapper\DeviceMonitorMapper.class
 com\example\monitor\service\impl\PromQueryRangeServiceImpl.class
+com\example\monitor\mapper\RefreshTokenMapper.class
 com\example\monitor\entity\FileManage.class
 com\example\monitor\service\JobSchedulerService.class
 com\example\monitor\entity\prometheus\PromQueryResult.class
@@ -58,6 +59,7 @@ com\example\monitor\controller\UserController.class
 com\example\monitor\service\UserService.class
 com\example\monitor\entity\UserSession.class
 com\example\monitor\entity\prometheus\PromQueryResponse.class
+com\example\monitor\entity\RefreshToken.class
 com\example\monitor\entity\NodeMonitor.class
 com\example\monitor\controller\FileController.class
 com\example\monitor\service\impl\PromQueryServiceImpl.class
@@ -67,5 +69,6 @@ com\example\monitor\entity\AlertRule.class
 com\example\monitor\service\NodeMonitorService.class
 com\example\monitor\service\impl\AlertRuleServiceImpl.class
 com\example\monitor\mapper\JobSchedulerMapper.class
+com\example\monitor\service\impl\AlarmInfoServiceImpl.class
 com\example\monitor\controller\DeviceController.class
 com\example\monitor\service\impl\UserSessionServiceImpl.class

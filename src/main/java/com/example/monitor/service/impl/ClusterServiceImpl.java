@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 public class ClusterServiceImpl extends ServiceImpl<ClusterMapper, Cluster> implements ClusterService {
 
     @Override
-    public Cluster getClusterById(Long id) {
+    public Cluster getByClusterName(String clusterName) {
         return baseMapper.selectOne(new LambdaQueryWrapper<Cluster>()
-                .eq(Cluster::getClusterId, id));
+                .eq(Cluster::getClusterName, clusterName));
     }
 }

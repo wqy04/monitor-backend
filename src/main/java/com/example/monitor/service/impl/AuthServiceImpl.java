@@ -25,6 +25,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private TokenStore tokenStore;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
     public Result<Map<String, Object>> register(User user) {
         if (user == null || !StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
@@ -55,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Result<Map<String, Object>> login(String username, String password) {
         if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
-            return Result.fail(400, "username/password required");
+            return Result.fail(400, "请填写用户名和密码");
         }
 
         User user = userService.getUserByUsername(username);
@@ -63,8 +66,8 @@ public class AuthServiceImpl implements AuthService {
             return Result.fail(401, "用户名或密码错误");
         }
 
-        String accessToken = JwtUtil.generateAccessToken(user.getUserId(), user.getUsername());
-        String refreshToken = JwtUtil.generateRefreshToken(user.getUserId(), user.getUsername());
+        String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getUsername());
         tokenStore.saveRefreshToken(refreshToken, user.getUserId());
 
         user.setLastLogin(LocalDateTime.now());
@@ -92,8 +95,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Integer userId = tokenStore.getUserIdByRefreshToken(refreshToken);
-        if (userId == null || !JwtUtil.validToken(refreshToken)) {
+        if (userId == null || !jwtUtil.validToken(refreshToken)) {
             return Result.fail(401, "refreshToken无效");
+        }
+
+        // 检查token类型
+        String tokenType = jwtUtil.getTokenType(refreshToken);
+        if (!"refresh".equals(tokenType)) {
+            return Result.fail(401, "Invalid token type");
         }
 
         User user = userService.getById(userId);
@@ -101,8 +110,8 @@ public class AuthServiceImpl implements AuthService {
             return Result.fail(404, "用户不存在");
         }
 
-        String newAccessToken = JwtUtil.generateAccessToken(user.getUserId(), user.getUsername());
-        String newRefreshToken = JwtUtil.generateRefreshToken(user.getUserId(), user.getUsername());
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getUsername());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserId(), user.getUsername());
 
         tokenStore.removeRefreshToken(refreshToken);
         tokenStore.saveRefreshToken(newRefreshToken, user.getUserId());
@@ -137,12 +146,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Result<Map<String, Object>> updatePassword(Integer userId, String password) {
-        if (userId == null || !StringUtils.hasText(password)) {
-            return Result.fail(400, "userId/password required");
+    public Result<Map<String, Object>> updatePassword(String username, String password) {
+        if (username == null || !StringUtils.hasText(password)) {
+            return Result.fail(400, "缺少用户名或密码");
         }
 
-        User user = userService.getById(userId);
+        User user = userService.getUserByUsername(username);
         if (user == null) {
             return Result.fail(404, "用户不存在");
         }
@@ -151,7 +160,7 @@ public class AuthServiceImpl implements AuthService {
         userService.updateById(user);
 
         Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId);
+        data.put("userId", user.getUserId());
         return Result.ok("密码修改成功", data);
     }
 }
