@@ -5,7 +5,6 @@ import com.example.monitor.entity.RefreshToken;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
 
 @Mapper
 public interface RefreshTokenMapper extends BaseMapper<RefreshToken> {
