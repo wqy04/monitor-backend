@@ -9,4 +9,6 @@ import com.example.monitor.entity.JobScheduler;
 public interface JobSchedulerService extends IService<JobScheduler> {
     // 可扩展自定义业务方法，例如：根据调度ID查询作业调度信息
     JobScheduler getJobSchedulerById(Long id);
+
+    JobScheduler findByClusterId(Integer clusterId);
 }

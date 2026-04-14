@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPassword(PasswordUtil.encrypt(user.getPassword()));
         user.setStatus("active");
-        user.setUserRole("1");
+        user.setUserRole(1);
         user.setCreateTime(LocalDateTime.now());
 
         boolean saved = userService.save(user);

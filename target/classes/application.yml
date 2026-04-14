@@ -43,7 +43,7 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml 
 
 prometheus:
-  url: http://prometheus-server:9090
+  url: http://localhost:9090
 
 # JWT配置
 jwt:

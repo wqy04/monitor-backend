@@ -40,4 +40,9 @@ public class AlarmInfo {
      * 处理状态：0-未解决，1-已确认，2-已解决
      */
     private Integer status;
+
+    /**
+     * 所属集群ID
+     */
+    private Integer clusterId;
 }

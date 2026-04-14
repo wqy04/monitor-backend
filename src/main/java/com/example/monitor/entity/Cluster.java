@@ -24,6 +24,11 @@ public class Cluster {
     private String clusterName;
 
     /**
+     * 厂商：曙光/浪潮/联想等
+     */
+    private String vendor;
+
+    /**
      * 集群描述
      */
     private String description;

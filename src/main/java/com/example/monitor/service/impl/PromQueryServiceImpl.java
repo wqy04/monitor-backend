@@ -11,6 +11,7 @@ import com.example.monitor.entity.prometheus.PromQueryResponse;
 import com.example.monitor.service.PromQueryService;
 import com.example.monitor.utils.RestTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,6 +27,9 @@ import java.util.Objects;
 public class PromQueryServiceImpl implements PromQueryService {
     @Resource
     private RestTemplateUtils restTemplateUtils;
+
+    @Value("${prometheus.url:http://prometheus-server:9090}")
+    private String prometheusUrl;
     
     @Override
     public PromQueryData getQueryDataInfo(String query, String time) {
@@ -37,8 +41,8 @@ public class PromQueryServiceImpl implements PromQueryService {
         param.put("query", query);
         param.put("time", time);
     
-        // prometheus的URL连接地址, 根据需要修改
-        String url = "http://localhost:9090" + "/api/v1/query";
+        // prometheus的URL连接地址, 从配置获取
+        String url = prometheusUrl + "/api/v1/query";
         return (PromQueryData) getDataInfo(url, param);
     }
     

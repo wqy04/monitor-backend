@@ -9,4 +9,6 @@ import com.example.monitor.entity.AlarmInfo;
 public interface AlarmInfoService extends IService<AlarmInfo> {
     // 可扩展自定义业务方法，例如：根据告警ID查询告警信息
     AlarmInfo getAlarmInfoById(Long id);
+
+    AlarmInfo findByNoticeAndTarget(String notice, String target);
 }

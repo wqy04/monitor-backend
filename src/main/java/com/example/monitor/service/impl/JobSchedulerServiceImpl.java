@@ -18,4 +18,10 @@ public class JobSchedulerServiceImpl extends ServiceImpl<JobSchedulerMapper, Job
         return baseMapper.selectOne(new LambdaQueryWrapper<JobScheduler>()
                 .eq(JobScheduler::getSchedulerId, id));
     }
+
+    @Override
+    public JobScheduler findByClusterId(Integer clusterId) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<JobScheduler>()
+                .eq(JobScheduler::getClusterId, clusterId));
+    }
 }

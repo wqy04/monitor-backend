@@ -15,4 +15,11 @@ public class AlarmInfoServiceImpl extends ServiceImpl<AlarmInfoMapper, AlarmInfo
         return baseMapper.selectOne(new LambdaQueryWrapper<AlarmInfo>()
                 .eq(AlarmInfo::getId, id));
     }
+
+    @Override
+    public AlarmInfo findByNoticeAndTarget(String notice, String target) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<AlarmInfo>()
+                .eq(AlarmInfo::getNotice, notice)
+                .eq(AlarmInfo::getTarget, target));
+    }
 }

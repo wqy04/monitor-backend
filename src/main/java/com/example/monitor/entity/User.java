@@ -32,7 +32,7 @@ public class User {
     /**
      * 用户角色：0-系统管理员 1-普通用户
      */
-    private String userRole;
+    private Integer userRole;
 
     /**
      * 状态：active-激活 inactive-未激活
@@ -53,4 +53,8 @@ public class User {
      * 用户所属学院
      */
     private String department;
+
+    public void setUserRole(int userRole) {
+        this.userRole = userRole;
+    }
 }

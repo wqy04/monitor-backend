@@ -18,4 +18,11 @@ public class NodeMonitorServiceImpl extends ServiceImpl<NodeMonitorMapper, NodeM
         return baseMapper.selectOne(new LambdaQueryWrapper<NodeMonitor>()
                 .eq(NodeMonitor::getNodeId, id));
     }
+
+    @Override
+    public NodeMonitor findByNodeNameAndClusterId(String nodeName, Integer clusterId) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<NodeMonitor>()
+                .eq(NodeMonitor::getNodeName, nodeName)
+                .eq(NodeMonitor::getClusterId, clusterId));
+    }
 }

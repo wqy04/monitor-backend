@@ -1,6 +1,7 @@
 package com.example.monitor.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class NodeMonitor {
     /**
      * 所属队列
      */
+    @TableField(value = "`partition`")
     private String partition;
 
     /**
@@ -38,12 +40,12 @@ public class NodeMonitor {
     /**
      * 总内存（MB）
      */
-    private Integer memoryTotal;
+    private Long memoryTotal;
 
     /**
      * 总磁盘空间（MB）
      */
-    private Integer diskTotal;
+    private Long diskTotal;
 
     /**
      * 节点角色：0-登录节点 1-计算节点 2-存储节点
@@ -53,7 +55,27 @@ public class NodeMonitor {
     /**
      * 节点类型
      */
-    private Integer nodeType;
+    private String nodeType;
+
+    /**
+     * CPU型号/架构
+     */
+    private String cpuModel;
+
+    /**
+     * 操作系统类型
+     */
+    private String osType;
+
+    /**
+     * 最大作业槽数（可能不等于CPU核数）
+     */
+    private Integer slotsMax;
+
+    /**
+     * 整机型号（如有）
+     */
+    private String nodeModel;
 
     /**
      * GPU型号
@@ -68,7 +90,7 @@ public class NodeMonitor {
     /**
      * GPU总显存（MB）
      */
-    private Integer gpuMemoryTotal;
+    private Long gpuMemoryTotal;
 
     /**
      * 所属集群ID
@@ -78,6 +100,7 @@ public class NodeMonitor {
     /**
      * IPMI专用IP地址
      */
+    @TableField(value = "ipmi_ip")
     private String ipmiIP;
 
     /**
@@ -93,7 +116,7 @@ public class NodeMonitor {
     /**
      * 是否支持功耗采集：0-否，1-是
      */
-    private Boolean powerSupported;
+    private Integer powerSupported;
 
     /**
      * Prometheus功耗指标名称

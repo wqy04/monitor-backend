@@ -1,6 +1,7 @@
 package com.example.monitor.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class JobMonitor {
     /**
      * 队列名称（或分区）
      */
+    @TableField(value = "`partition`")
     private String partition;
 
     /**
@@ -50,7 +52,7 @@ public class JobMonitor {
     /**
      * 调度器生成的作业ID
      */
-    private Integer externalJobId;
+    private String externalJobId;
 
     /**
      * 运行集群ID
