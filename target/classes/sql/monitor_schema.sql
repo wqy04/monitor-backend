@@ -17,6 +17,9 @@ CREATE TABLE `clusters` (
     PRIMARY KEY (`cluster_id`),
     UNIQUE KEY `uk_cluster_name` (`cluster_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='集群信息表';
+ALTER TABLE `clusters` ADD COLUMN `prometheus_job` VARCHAR(64) DEFAULT NULL COMMENT 'Prometheus job名称';
+ALTER TABLE `clusters` ADD COLUMN `instance` VARCHAR(64) DEFAULT NULL COMMENT 'Prometheus instance名称';
+ALTER TABLE `clusters` ADD COLUMN `master_node` VARCHAR(64) DEFAULT NULL COMMENT 'Master节点名称';
 
 -- 2. 用户表
 DROP TABLE IF EXISTS `users`;

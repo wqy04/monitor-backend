@@ -35,23 +35,23 @@ public class ClusterController {
 
         Map<Integer, JSONObject> promClusterMap = fetchPrometheusClusterInfo();
 
+        // 获取所有节点并按集群分组计数
+        List<NodeMonitor> allNodes = nodeMonitorService.list();
+        Map<Integer, Long> clusterNodeCount = allNodes.stream()
+                .collect(Collectors.groupingBy(NodeMonitor::getClusterId, Collectors.counting()));
+
         for (Cluster cluster : clusters) {
             Map<String, Object> item = new HashMap<>();
             item.put("clusterId", cluster.getClusterId());
             item.put("clusterName", cluster.getClusterName());
             item.put("description", cluster.getDescription());
-            item.put("prometheusJob", cluster.getClusterName());
+            item.put("prometheusJob", cluster.getPrometheusJob() != null ? cluster.getPrometheusJob() : cluster.getClusterName());
+            item.put("instance", cluster.getInstance());
+            item.put("masterNode", cluster.getMasterNode());
+            item.put("vendor", cluster.getVendor());
+            item.put("nodeTotal", clusterNodeCount.getOrDefault(cluster.getClusterId(), 0L));
 
-            JSONObject prom = promClusterMap.get(cluster.getClusterId());
-            if (prom != null) {
-                item.put("prometheusTargets", prom.getJSONArray("targets"));
-                item.put("status", prom.getString("status"));
-                item.put("lastScrape", prom.getString("lastScrape"));
-            } else {
-                item.put("prometheusTargets", Collections.emptyList());
-                item.put("status", "unknown");
-                item.put("lastScrape", null);
-            }
+            
             records.add(item);
         }
         return Result.ok(records);
@@ -67,7 +67,9 @@ public class ClusterController {
         item.put("clusterId", cluster.getClusterId());
         item.put("clusterName", cluster.getClusterName());
         item.put("description", cluster.getDescription());
-        item.put("prometheusJob", cluster.getClusterName());
+        item.put("prometheusJob", cluster.getPrometheusJob() != null ? cluster.getPrometheusJob() : cluster.getClusterName());
+        item.put("instance", cluster.getInstance());
+        item.put("masterNode", cluster.getMasterNode());
 
         JSONObject prom = fetchPrometheusClusterInfo().get(cluster.getClusterId());
         if (prom != null) {

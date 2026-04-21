@@ -14,7 +14,8 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 /**
  * 景行调度器适配器（联想集群）
@@ -40,15 +41,22 @@ public class JingxingAdapter implements ClusterMetadataAdapter {
         List<Cluster> clusters = new ArrayList<>();
         PromQueryData data = promQueryService.getQueryDataInfo("jingxing_cluster_info", null);
         if (data == null) return clusters;
-
         for (PromQueryResult result : data.getResult()) {
             Map<String, Object> metric = result.getMetric();
-            String clusterName = (String) metric.get("cluster");
+            String clusterName = (String) metric.get("exported_cluster");
+            String prometheusJob = (String) metric.get("job");
+            String instance = (String) metric.get("instance");
+            String vendor = (String) metric.get("cluster");
+            String description = (String) metric.get("__name__");
+            String masterNode = (String) metric.get("master");
             if (StringUtils.hasText(clusterName)) {
                 Cluster cluster = new Cluster();
+                cluster.setPrometheusJob(prometheusJob);
+                cluster.setInstance(instance);
                 cluster.setClusterName(clusterName);
-                cluster.setVendor("联想");
-                cluster.setDescription("景行调度器集群");
+                cluster.setVendor(vendor);
+                cluster.setDescription(description);
+                cluster.setMasterNode(masterNode);
                 clusters.add(cluster);
             }
         }

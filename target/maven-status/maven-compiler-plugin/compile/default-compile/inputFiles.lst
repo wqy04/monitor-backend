@@ -63,6 +63,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\JobScheduler.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\FileManage.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\AppMapper.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\NodeController.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\JobMonitor.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AlarmInfoServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\Gpu.java

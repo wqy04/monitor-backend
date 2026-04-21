@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +56,7 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        log.info("开始初始化集群静态数据...");
+        System.out.println("开始初始化集群静态数据...");
         for (ClusterMetadataAdapter adapter : adapters) {
             if (!adapter.supports(promQueryService)) {
                 log.debug("适配器 {} 不适用于当前环境，跳过", adapter.getClass().getSimpleName());

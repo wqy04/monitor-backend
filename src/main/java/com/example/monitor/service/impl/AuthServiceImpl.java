@@ -1,6 +1,5 @@
 package com.example.monitor.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.monitor.dto.Result;
 import com.example.monitor.entity.User;
 import com.example.monitor.service.AuthService;

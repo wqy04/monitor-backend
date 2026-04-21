@@ -32,4 +32,19 @@ public class Cluster {
      * 集群描述
      */
     private String description;
+
+    /**
+     * Prometheus job 名称
+     */
+    private String prometheusJob;
+
+    /**
+     * Prometheus instance 名称
+     */
+    private String instance;
+
+    /**
+     * Master 节点名称
+     */
+    private String masterNode;
 }
