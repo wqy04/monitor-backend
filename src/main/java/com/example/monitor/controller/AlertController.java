@@ -1,15 +1,20 @@
 package com.example.monitor.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.monitor.dto.Result;
 import com.example.monitor.entity.AlarmInfo;
 import com.example.monitor.entity.AlertRule;
+import com.example.monitor.entity.Cluster;
 import com.example.monitor.service.AlarmInfoService;
 import com.example.monitor.service.AlertRuleService;
+import com.example.monitor.service.ClusterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,21 +29,47 @@ public class AlertController {
     @Autowired
     private AlertRuleService alertRuleService;
 
+    @Autowired
+    private ClusterService clusterService;
+
     @GetMapping("/alerts")
     public Result<Map<String, Object>> listAlerts(@RequestParam(value = "status", required = false) Integer status,
-                                                   @RequestParam(value = "level", required = false) Integer level,
-                                                   @RequestParam(value = "target", required = false) String target,
-                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                   @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
+                                                @RequestParam(value = "level", required = false) Integer level,
+                                                @RequestParam(value = "target", required = false) String target,
+                                                @RequestParam(value = "notice", required = false) String notice,
+                                                @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                                @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize) {
         LambdaQueryWrapper<AlarmInfo> wrapper = new LambdaQueryWrapper<>();
         if (status != null) wrapper.eq(AlarmInfo::getStatus, status);
         if (level != null) wrapper.eq(AlarmInfo::getLevel, level);
         if (target != null) wrapper.like(AlarmInfo::getTarget, target);
-        List<AlarmInfo> list = alarmInfoService.list(wrapper);
-
+        if (notice != null) wrapper.like(AlarmInfo::getNotice, notice);
+        
+        Page<AlarmInfo> page = new Page<>(pageNum, pageSize);
+        IPage<AlarmInfo> result = alarmInfoService.page(page, wrapper);
+        
+        List<Map<String, Object>> enhancedList = new ArrayList<>();
+        for (AlarmInfo alarm : result.getRecords()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", alarm.getId());
+            map.put("notice", alarm.getNotice());
+            map.put("updateTime", alarm.getUpdateTime());
+            map.put("target", alarm.getTarget());
+            map.put("level", alarm.getLevel());
+            map.put("status", alarm.getStatus());
+            map.put("clusterId", alarm.getClusterId());
+            if (alarm.getClusterId() != null) {
+                Cluster cluster = clusterService.getById(alarm.getClusterId());
+                map.put("clusterName", cluster != null ? cluster.getClusterName() : null);
+            } else {
+                map.put("clusterName", null);
+            }
+            enhancedList.add(map);
+        }
+        
         Map<String, Object> data = new HashMap<>();
-        data.put("total", list.size());
-        data.put("list", list);
+        data.put("total", result.getTotal());
+        data.put("list", enhancedList);
         return Result.ok(data);
     }
 

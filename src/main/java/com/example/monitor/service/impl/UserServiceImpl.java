@@ -18,4 +18,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return baseMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, username));
     }
+
+    @Override
+    public User getById(Long id) {
+        return super.getById(id);
+    }
 }

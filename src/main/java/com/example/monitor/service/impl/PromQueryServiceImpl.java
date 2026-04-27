@@ -46,6 +46,29 @@ public class PromQueryServiceImpl implements PromQueryService {
         return (PromQueryData) getDataInfo(url, param);
     }
     
+    @Override
+    public PromQueryData getQueryRangeDataInfo(String query, String start, String end, String step) {
+        if (StringUtils.isBlank(start)) {
+            start = String.valueOf(DateUtil.currentSeconds() - 3600);
+        }
+        if (StringUtils.isBlank(end)) {
+            end = String.valueOf(DateUtil.currentSeconds());
+        }
+        if (StringUtils.isBlank(step)) {
+            step = "15";
+        }
+
+        JSONObject param = new JSONObject();
+        param.put("query", query);
+        param.put("start", start);
+        param.put("end", end);
+        param.put("step", step);
+    
+        // prometheus的URL连接地址, 从配置获取
+        String url = prometheusUrl + "/api/v1/query_range";
+        return (PromQueryData) getDataInfo(url, param);
+    }
+    
     /**
      * 获取查询结果数据
      *

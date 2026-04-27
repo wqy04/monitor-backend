@@ -18,4 +18,15 @@ public interface PromQueryService {
      * @return {@code PromQueryData}
      */
     PromQueryData getQueryDataInfo(String query, String time);
+
+    /**
+     * Prometheus范围查询
+     *
+     * @param query      查询
+     * @param start      开始时间戳, 单位: 秒
+     * @param end        结束时间戳, 单位: 秒
+     * @param step       步长, 单位: 秒
+     * @return {@code PromQueryData}
+     */
+    PromQueryData getQueryRangeDataInfo(String query, String start, String end, String step);
 }

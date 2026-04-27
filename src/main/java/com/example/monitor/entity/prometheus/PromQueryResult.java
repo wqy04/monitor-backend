@@ -22,4 +22,9 @@ public class PromQueryResult {
      * prometheus即时查询指标值
      */
     private List<String> value;
+
+    /**
+     * prometheus范围查询指标值列表
+     */
+    private List<List<String>> values;
 }

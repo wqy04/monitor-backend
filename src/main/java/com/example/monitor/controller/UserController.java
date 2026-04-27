@@ -1,6 +1,7 @@
 package com.example.monitor.controller;
 
 // import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.example.monitor.dto.Result;
 import com.example.monitor.entity.User;
 import com.example.monitor.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import java.util.List;
  * 用户接口控制器
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
@@ -33,8 +34,9 @@ public class UserController {
      * 根据ID查询用户
      */
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getById(id);
+    public Result<User> getUserById(@PathVariable Long id) {
+        User user = userService.getById(id);
+        return Result.ok(user);
     }
 
     /**
