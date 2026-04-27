@@ -128,6 +128,18 @@ public class AlertController {
         alertRuleService.removeById(ruleId);
         Map<String, Object> data = new HashMap<>();
         data.put("ruleId", ruleId);
-        return Result.ok("规则创建成功", data);
+        return Result.ok("规则删除成功", data);
+    }
+
+    @DeleteMapping("/alerts/{id}")
+    public Result<Map<String, Object>> deleteAlertById(@PathVariable Integer id) {
+        AlarmInfo alarm = alarmInfoService.getAlarmInfoById(id);
+        if (alarm == null) {
+            return Result.fail(404, "alert not found");
+        }
+        alarmInfoService.removeById(id);
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", id);
+        return Result.ok("告警删除成功", data);
     }
 }

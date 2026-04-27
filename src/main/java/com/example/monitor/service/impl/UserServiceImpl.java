@@ -20,7 +20,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getById(Long id) {
+    public User getById(Integer id) {
         return super.getById(id);
+    }
+
+    @Override
+    public boolean updateById(Integer id, User user) {
+        user.setUserId(id);
+        return super.updateById(user);
     }
 }

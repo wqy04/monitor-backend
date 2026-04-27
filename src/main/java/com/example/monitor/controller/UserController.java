@@ -34,7 +34,7 @@ public class UserController {
      * 根据ID查询用户
      */
     @GetMapping("/{id}")
-    public Result<User> getUserById(@PathVariable Long id) {
+    public Result<User> getUserById(@PathVariable Integer id) {
         User user = userService.getById(id);
         return Result.ok(user);
     }
@@ -59,9 +59,9 @@ public class UserController {
      * 更新用户
      */
     @PutMapping
-    public String updateUser(@RequestBody User user) {
-        boolean update = userService.updateById(user);
-        return update ? "更新成功" : "更新失败";
+    public Result<Object> updateUser(@RequestBody User user) {
+        boolean update = userService.updateById(user.getUserId(), user);
+        return update ? Result.ok(null) : Result.fail("更新失败");
     }
 
     /**

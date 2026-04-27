@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AlarmInfoServiceImpl extends ServiceImpl<AlarmInfoMapper, AlarmInfo> implements AlarmInfoService {
 
     @Override
-    public AlarmInfo getAlarmInfoById(Long id) {
+    public AlarmInfo getAlarmInfoById(Integer id) {
         return baseMapper.selectOne(new LambdaQueryWrapper<AlarmInfo>()
                 .eq(AlarmInfo::getId, id));
     }
@@ -21,5 +21,10 @@ public class AlarmInfoServiceImpl extends ServiceImpl<AlarmInfoMapper, AlarmInfo
         return baseMapper.selectOne(new LambdaQueryWrapper<AlarmInfo>()
                 .eq(AlarmInfo::getNotice, notice)
                 .eq(AlarmInfo::getTarget, target));
+    }
+
+    @Override
+    public boolean removeById(Integer id) {
+        return super.removeById(id);
     }
 }

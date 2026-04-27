@@ -13,5 +13,10 @@ public interface UserService extends IService<User> {
     /**
      * 根据ID查询用户
      */
-    User getById(Long id);
+    User getById(Integer id);
+
+    /**
+     * 根据ID更新用户
+     */
+    boolean updateById(Integer id, User user);
 }
