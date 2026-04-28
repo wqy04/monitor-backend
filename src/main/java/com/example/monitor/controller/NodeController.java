@@ -2,9 +2,11 @@ package com.example.monitor.controller;
 
 import com.example.monitor.dto.Result;
 import com.example.monitor.entity.NodeMonitor;
+import com.example.monitor.entity.NodeQueue;
 import com.example.monitor.entity.prometheus.PromQueryData;
 import com.example.monitor.entity.prometheus.PromQueryResult;
 import com.example.monitor.service.NodeMonitorService;
+import com.example.monitor.service.NodeQueueService;
 import com.example.monitor.service.PromQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,9 @@ public class NodeController {
 
     @Autowired
     private NodeMonitorService nodeMonitorService;
+
+    @Autowired
+    private NodeQueueService nodeQueueService;
 
     @Autowired
     private PromQueryService promQueryService;
@@ -41,6 +46,12 @@ public class NodeController {
     public Result<Map<String, Object>> listNodes() {
         List<NodeMonitor> nodes = nodeMonitorService.list();
         Map<String, Map<String, Object>> promNodeMap = fetchPrometheusNodeInfo();
+        List<NodeQueue> allNodeQueues = nodeQueueService.list();
+        Map<Integer, List<String>> nodeQueueMap = new HashMap<>();
+        for (NodeQueue nodeQueue : allNodeQueues) {
+            nodeQueueMap.computeIfAbsent(nodeQueue.getNodeId(), k -> new ArrayList<>())
+                    .add(nodeQueue.getQueueName());
+        }
 
         List<Map<String, Object>> nodeList = new ArrayList<>();
         for (NodeMonitor node : nodes) {
@@ -63,6 +74,7 @@ public class NodeController {
             item.put("powerSupported", node.getPowerSupported());
             item.put("powerMetricName", node.getPowerMetricName());
             item.put("clusterId", node.getClusterId());
+            item.put("queues", nodeQueueMap.getOrDefault(node.getNodeId(), Collections.emptyList()));
 
             // 动态字段（来自 Prometheus，已过滤冗余）
             Map<String, Object> dynamic = promNodeMap.get(node.getNodeName());

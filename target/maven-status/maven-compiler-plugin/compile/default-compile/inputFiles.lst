@@ -58,6 +58,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\servic
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\JingxingAdapter.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\JobController.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\AlertController.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\QueueInfoServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\UserSession.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\RefreshTokenMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\JobScheduler.java
@@ -76,6 +77,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\PromQueryService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\prometheus\PromQueryResult.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\UserSessionMapper.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\QueueInfoService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\PromQueryRangeServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\NodeMonitorService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\UserSessionServiceImpl.java
@@ -86,6 +88,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\utils\
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\ClusterMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AuthServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\UserController.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\QueueController.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\DeviceMonitorMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AppServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\UserSessionService.java
