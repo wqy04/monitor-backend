@@ -37,7 +37,6 @@ com\example\monitor\mapper\UserSessionMapper.class
 com\example\monitor\mapper\NodeQueueMapper.class
 com\example\monitor\entity\prometheus\PromQueryData.class
 com\example\monitor\util\TokenStore.class
-com\example\monitor\controller\UserController.class
 com\example\monitor\entity\UserSession.class
 com\example\monitor\entity\prometheus\PromQueryResponse.class
 com\example\monitor\entity\RefreshToken.class

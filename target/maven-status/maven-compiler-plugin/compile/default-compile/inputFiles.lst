@@ -13,8 +13,10 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\NodeMonitorServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\PromQueryServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\ClusterController.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\dto\AppInfoDTO.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\prometheus\PromQueryData.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AlertRuleServiceImpl.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\AppController.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\util\PasswordUtil.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\Queue.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\GpuServiceImpl.java
@@ -75,6 +77,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\servic
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\AlertRule.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\AlarmInfoMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\PromQueryService.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\config\WebConfig.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\prometheus\PromQueryResult.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\UserSessionMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\QueueInfoService.java
@@ -82,12 +85,14 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\servic
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\NodeMonitorService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\UserSessionServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\AlarmInfoService.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\PrometheusService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\PromSeriesService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\JobSchedulerServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\utils\RestTemplateUtils.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\ClusterMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AuthServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\UserController.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\dto\UserPrometheusData.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\controller\QueueController.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\DeviceMonitorMapper.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\AppServiceImpl.java

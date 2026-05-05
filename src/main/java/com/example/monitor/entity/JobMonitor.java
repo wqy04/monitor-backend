@@ -1,21 +1,18 @@
 package com.example.monitor.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
- * 作业监控数据表
+ * Prometheus 作业信息
  * 对应数据库表：jobs
  */
 @Data
 @TableName("jobs")
 public class JobMonitor {
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     private Integer jobId;
 
     /**
@@ -24,103 +21,57 @@ public class JobMonitor {
     private String jobName;
 
     /**
-     * 所属队列
+     * 作业队列
      */
     private String queue;
 
     /**
-     * 队列名称（或分区）
+     * 作业用户名
      */
-    @TableField(value = "`partition`")
-    private String partition;
+    private String username;
 
     /**
-     * 作业状态：PENDING/RUNNING/COMPLETED/FAILED/CANCELLED
+     * 作业工作目录
+     */
+    private String cwd;
+
+    /**
+     * 作业提交主机
+     */
+    private String fromHost;
+
+    /**
+     * 作业执行主机
+     */
+    private String execHost;
+
+    /**
+     * 作业状态
      */
     private String status;
 
     /**
-     * 作业描述
+     * CPU 使用秒数
      */
-    private String description;
+    private Double cpuUsageSeconds;
 
     /**
-     * 调度器ID
+     * CPU 利用率
      */
-    private Integer schedulerId;
+    private Double cpuUtilPercent;
 
     /**
-     * 调度器生成的作业ID
+     * 内存使用字节
      */
-    private String externalJobId;
+    private Double memUsedBytes;
 
     /**
-     * 运行集群ID
+     * 空闲率
      */
-    private Integer clusterId;
+    private Double idleRate;
 
     /**
-     * 提交用户ID
+     * 运行时间秒
      */
-    private Integer userId;
-
-    /**
-     * 提交时间
-     */
-    private LocalDateTime submitTime;
-
-    /**
-     * 开始运行时间
-     */
-    private LocalDateTime startTime;
-
-    /**
-     * 结束时间
-     */
-    private LocalDateTime endTime;
-
-    /**
-     * 运行时长（秒）
-     */
-    private Long elapsed;
-
-    /**
-     * 申请节点数
-     */
-    private Integer numNodes;
-
-    /**
-     * 工作目录
-     */
-    private String workDir;
-
-    /**
-     * 申请CPU核数
-     */
-    private Integer cpuCores;
-
-    /**
-     * CPU核时
-     */
-    private BigDecimal cpuCoresHours;
-
-    /**
-     * 申请GPU核数
-     */
-    private Integer gpuCores;
-
-    /**
-     * 申请GPU型号
-     */
-    private String gpuModel;
-
-    /**
-     * GPU核时
-     */
-    private BigDecimal gpuCoresHours;
-
-    /**
-     * 应用软件名称
-     */
-    private String appName;
+    private Double runtimeSeconds;
 }

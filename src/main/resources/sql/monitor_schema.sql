@@ -175,36 +175,21 @@ CREATE TABLE `user_sessions` (
 -- 7. 作业监控数据表
 DROP TABLE IF EXISTS `jobs`;
 CREATE TABLE `jobs` (
-    `job_id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `job_name`        VARCHAR(128) NOT NULL,
-    `queue`           VARCHAR(64)  NOT NULL,
-    `partition`       VARCHAR(64)  DEFAULT NULL,
-    `status`          VARCHAR(32)  NOT NULL DEFAULT 'PENDING',
-    `description`     TEXT         DEFAULT NULL,
-    `scheduler_id`    INT UNSIGNED NOT NULL,
-    `external_job_id` VARCHAR(64)  NOT NULL COMMENT '调度器原生作业ID',
-    `cluster_id`      INT UNSIGNED NOT NULL,
-    `user_id`         INT UNSIGNED NOT NULL,
-    `submit_time`     DATETIME     DEFAULT NULL,
-    `start_time`      DATETIME     DEFAULT NULL,
-    `end_time`        DATETIME     DEFAULT NULL,
-    `elapsed`         BIGINT UNSIGNED DEFAULT NULL,
-    `num_nodes`       INT UNSIGNED DEFAULT NULL,
-    `work_dir`        VARCHAR(255) DEFAULT NULL,
-    `cpu_cores`       INT UNSIGNED DEFAULT NULL,
-    `cpu_cores_hours` DECIMAL(12,2) UNSIGNED DEFAULT NULL,
-    `gpu_cores`       INT UNSIGNED DEFAULT NULL,
-    `gpu_model`       VARCHAR(64)  DEFAULT NULL,
-    `gpu_cores_hours` DECIMAL(12,2) UNSIGNED DEFAULT NULL,
-    `app_name`        VARCHAR(64)  DEFAULT NULL,
-    PRIMARY KEY (`job_id`),
-    KEY `fk_job_scheduler` (`scheduler_id`),
-    KEY `fk_job_cluster` (`cluster_id`),
-    KEY `fk_job_user` (`user_id`),
-    CONSTRAINT `fk_job_scheduler` FOREIGN KEY (`scheduler_id`) REFERENCES `job_schedulers` (`scheduler_id`),
-    CONSTRAINT `fk_job_cluster`   FOREIGN KEY (`cluster_id`)   REFERENCES `clusters` (`cluster_id`),
-    CONSTRAINT `fk_job_user`      FOREIGN KEY (`user_id`)      REFERENCES `users` (`user_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='作业历史与统计表';
+    `job_id`            INT UNSIGNED NOT NULL COMMENT 'Prometheus 作业ID',
+    `job_name`          VARCHAR(128) NOT NULL COMMENT '作业名称',
+    `queue`             VARCHAR(64)  DEFAULT NULL COMMENT '队列名称',
+    `username`          VARCHAR(64)  DEFAULT NULL COMMENT '作业用户',
+    `cwd`               VARCHAR(255) DEFAULT NULL COMMENT '工作目录',
+    `from_host`         VARCHAR(64)  DEFAULT NULL COMMENT '提交主机',
+    `exec_host`         VARCHAR(64)  DEFAULT NULL COMMENT '执行主机',
+    `status`            VARCHAR(32)  DEFAULT NULL COMMENT '作业状态',
+    `cpu_usage_seconds` DOUBLE        DEFAULT NULL COMMENT 'CPU 使用秒数',
+    `cpu_util_percent`  DOUBLE        DEFAULT NULL COMMENT 'CPU 利用率',
+    `mem_used_bytes`    DOUBLE        DEFAULT NULL COMMENT '内存使用字节',
+    `idle_rate`         DOUBLE        DEFAULT NULL COMMENT '空闲率',
+    `runtime_seconds`   DOUBLE        DEFAULT NULL COMMENT '运行时间秒',
+    PRIMARY KEY (`job_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='Prometheus 作业信息表';
 
 -- 8. 告警信息表
 DROP TABLE IF EXISTS `alerts`;
@@ -297,3 +282,5 @@ SELECT * FROM alert_rules;
 SELECT * FROM devices;
 SELECT * FROM user_sessions;
 SELECT * FROM refresh_tokens;
+
+

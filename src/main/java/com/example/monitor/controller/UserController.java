@@ -1,8 +1,9 @@
 package com.example.monitor.controller;
 
-// import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.monitor.dto.Result;
+import com.example.monitor.dto.UserPrometheusData;
 import com.example.monitor.entity.User;
+import com.example.monitor.service.PrometheusService;
 import com.example.monitor.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PrometheusService prometheusService;
 
     /**
      * 新增用户
@@ -71,5 +75,14 @@ public class UserController {
     public String deleteUser(@PathVariable Long id) {
         boolean remove = userService.removeById(id);
         return remove ? "删除成功" : "删除失败";
+    }
+
+    /**
+     * 获取Prometheus用户相关数据
+     */
+    @GetMapping("/prometheus-data")
+    public Result<UserPrometheusData> getPrometheusData() {
+        UserPrometheusData data = prometheusService.getUserPrometheusData();
+        return Result.ok(data);
     }
 }
