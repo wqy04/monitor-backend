@@ -78,7 +78,12 @@ public class ClusterController {
                 }
                 Map<String, Object> nodeInfo = promNodeMap.computeIfAbsent(host, k -> new HashMap<>());
                 if ("status".equals(key)) {
-                    nodeInfo.put("status", val == 1.0 ? "ok" : "unavail");
+                    String statusLabel = labels.get("status") != null ? labels.get("status").toString() : null;
+                    if (statusLabel != null) {
+                        nodeInfo.put("status", statusLabel);
+                    } else {
+                        nodeInfo.put("status", val == 1.0 ? "ok" : "unavail");
+                    }
                 } else if ("slots_used".equals(key)) {
                     nodeInfo.put("slotsUsed", val);
                 } else if ("cpu_util_percent".equals(key)) {
@@ -144,8 +149,8 @@ public class ClusterController {
                     String status = (String) dynamic.get("status");
                     if ("ok".equals(status)) {
                         onlineCount++;
-                    } else if ("unavail".equals(status)) {
-                        offlineCount++;
+                    } else {
+                        offlineCount++;   // 包含了 closed、unavail 等所有非 ok 状态
                     }
                     Object usedObj = dynamic.get("slotsUsed");
                     if (usedObj != null) {

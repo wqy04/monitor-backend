@@ -115,7 +115,14 @@ public class NodeController {
                     double value = Double.parseDouble(valueList.get(1));
                     Map<String, Object> nodeDataMap = result.computeIfAbsent(host, k -> new HashMap<>());
                     if ("status".equals(key)) {
-                        nodeDataMap.put(key, value == 1.0 ? "ok" : "unavail");
+                        // 直接使用 label 中的 status 字段
+                        String statusFromLabel = labels.get("status") != null ? labels.get("status").toString() : null;
+                        if (statusFromLabel != null) {
+                            nodeDataMap.put(key, statusFromLabel);
+                        } else {
+                            // 兼容旧数据或异常情况：根据 value 判断
+                            nodeDataMap.put(key, value == 1.0 ? "ok" : "unavail");
+                        }
                     } else {
                         nodeDataMap.put(key, value);
                     }
