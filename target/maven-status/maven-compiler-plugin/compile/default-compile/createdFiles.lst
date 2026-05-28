@@ -10,7 +10,6 @@ com\example\monitor\service\DataInitializer.class
 com\example\monitor\service\QueueService.class
 com\example\monitor\entity\JobMonitor.class
 com\example\monitor\service\UserSessionService.class
-com\example\monitor\service\impl\FileManageServiceImpl.class
 com\example\monitor\entity\Gpu.class
 com\example\monitor\service\FileManageService.class
 com\example\monitor\service\impl\NodeMonitorServiceImpl.class

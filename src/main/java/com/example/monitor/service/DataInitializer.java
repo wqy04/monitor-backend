@@ -48,8 +48,8 @@ public class DataInitializer implements ApplicationRunner {
     @Autowired
     private NodeQueueService nodeQueueService;
 
-    @Autowired
-    private JobSchedulerService jobSchedulerService;
+    // @Autowired
+    // private JobSchedulerService jobSchedulerService;
 
     @Autowired
     private List<ClusterMetadataAdapter> adapters;
@@ -144,7 +144,7 @@ public class DataInitializer implements ApplicationRunner {
                 }
                 log.info("告警处理完成，共 {} 条", alarms.size());
 
-                // 5. 扩展数据采集（仅对 JingxingAdapter 实例执行）
+                // 5. 扩展数据采集（根据适配器类型分别处理）
                 if (adapter instanceof JingxingAdapter) {
                     JingxingAdapter jingxingAdapter = (JingxingAdapter) adapter;
 
@@ -211,19 +211,61 @@ public class DataInitializer implements ApplicationRunner {
                     log.info("节点队列关联处理完成，共 {} 条", nodeQueues.size());
 
                     // 5.5 作业调度器
-                    JobScheduler scheduler = jingxingAdapter.discoverJobScheduler(cluster);
-                    scheduler.setClusterId(cluster.getClusterId());
-                    JobScheduler existingScheduler = jobSchedulerService.findByClusterId(cluster.getClusterId());
-                    if (existingScheduler == null) {
-                        jobSchedulerService.save(scheduler);
-                        log.info("新增作业调度器");
-                    } else {
-                        // 更新调度器状态等（若有变化）
-                        existingScheduler.setSchedulerName(scheduler.getSchedulerName());
-                        existingScheduler.setStatus(scheduler.getStatus());
-                        jobSchedulerService.updateById(existingScheduler);
-                        log.info("更新作业调度器");
+                //     JobScheduler scheduler = jingxingAdapter.discoverJobScheduler(cluster);
+                //     scheduler.setClusterId(cluster.getClusterId());
+                //     JobScheduler existingScheduler = jobSchedulerService.findByClusterId(cluster.getClusterId());
+                //     if (existingScheduler == null) {
+                //         jobSchedulerService.save(scheduler);
+                //         log.info("新增作业调度器");
+                //     } else {
+                //         // 更新调度器状态等（若有变化）
+                //         existingScheduler.setSchedulerName(scheduler.getSchedulerName());
+                //         existingScheduler.setStatus(scheduler.getStatus());
+                //         jobSchedulerService.updateById(existingScheduler);
+                //         log.info("更新作业调度器");
+                //     }
+                } else if (adapter instanceof SlurmAdapter) {
+                    SlurmAdapter slurmAdapter = (SlurmAdapter) adapter;
+
+                    // 5.1 集群用户
+                    List<ClusterUser> clusterUsers = slurmAdapter.discoverClusterUsers(cluster, promQueryService);
+                    for (ClusterUser user : clusterUsers) {
+                        user.setClusterId(cluster.getClusterId());
+                        ClusterUser existingUser = clusterUserService.findByUsernameAndClusterId(
+                                user.getUsername(), cluster.getClusterId());
+                        if (existingUser == null) {
+                            clusterUserService.save(user);
+                            log.debug("新增用户: {}", user.getUsername());
+                        } else {
+                            log.debug("用户已存在: {}", user.getUsername());
+                        }
                     }
+                    log.info("集群用户处理完成，共 {} 个", clusterUsers.size());
+
+                    // 5.2 节点-队列关联
+                    List<NodeQueue> nodeQueues = slurmAdapter.discoverNodeQueues(
+                            cluster, promQueryService, nodeNameToId, queueNameToId);
+                    for (NodeQueue nq : nodeQueues) {
+                        if (nodeQueueService.findByNodeIdAndQueueName(nq.getNodeId(), nq.getQueueName()) == null) {
+                            nodeQueueService.save(nq);
+                            log.debug("新增节点队列关联: nodeId={}, queue={}", nq.getNodeId(), nq.getQueueName());
+                        }
+                    }
+                    log.info("节点队列关联处理完成，共 {} 条", nodeQueues.size());
+
+                    // 5.3 作业调度器（可选，需要时取消注释并注入 JobSchedulerService）
+                    // JobScheduler scheduler = slurmAdapter.discoverJobScheduler(cluster);
+                    // scheduler.setClusterId(cluster.getClusterId());
+                    // JobScheduler existingScheduler = jobSchedulerService.findByClusterId(cluster.getClusterId());
+                    // if (existingScheduler == null) {
+                    //     jobSchedulerService.save(scheduler);
+                    //     log.info("新增作业调度器");
+                    // } else {
+                    //     existingScheduler.setSchedulerName(scheduler.getSchedulerName());
+                    //     existingScheduler.setStatus(scheduler.getStatus());
+                    //     jobSchedulerService.updateById(existingScheduler);
+                    //     log.info("更新作业调度器");
+                    // }
                 }
             }
         }

@@ -4,7 +4,8 @@ import cn.hutool.crypto.SecureUtil;
 
 public class PasswordUtil {
     public static String encrypt(String plaintext) {
-        return SecureUtil.md5(plaintext);
+        // 改用 SHA-256 哈希算法
+        return SecureUtil.sha256(plaintext);
     }
 
     public static boolean matches(String plaintext, String encrypted) {

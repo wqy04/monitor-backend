@@ -124,7 +124,7 @@ CREATE TABLE `queues` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='队列静态配置表';
 
 -- 4. 作业调度器数据表
-DROP TABLE IF EXISTS `job_schedulers`;
+/* DROP TABLE IF EXISTS `job_schedulers`;
 CREATE TABLE `job_schedulers` (
     `scheduler_id`   INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '调度器ID，主键',
     `scheduler_name` VARCHAR(32)  NOT NULL COMMENT '作业调度器名称',
@@ -136,7 +136,7 @@ CREATE TABLE `job_schedulers` (
     KEY `fk_scheduler_cluster` (`cluster_id`),
     CONSTRAINT `fk_scheduler_cluster` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`cluster_id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='作业调度器信息表';
+  DEFAULT CHARSET = utf8mb4 COMMENT ='作业调度器信息表'; */
 
 -- 5. 设备监控表
 DROP TABLE IF EXISTS `devices`;
@@ -208,7 +208,7 @@ CREATE TABLE `alerts` (
   DEFAULT CHARSET = utf8mb4 COMMENT ='告警信息表';
 
 -- 9. 告警规则表
-DROP TABLE IF EXISTS `alert_rules`;
+/* DROP TABLE IF EXISTS `alert_rules`;
 CREATE TABLE `alert_rules` (
     `rule_id`        INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '规则ID，主键',
     `rule_name`      VARCHAR(64)  NOT NULL COMMENT '规则名称，如GPU温度过高',
@@ -228,7 +228,7 @@ CREATE TABLE `alert_rules` (
     `scope_id`      INT UNSIGNED          DEFAULT NULL COMMENT '对应集群/节点的ID（当scope_type为cluster或node时使用）',
     PRIMARY KEY (`rule_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='告警规则表';
+  DEFAULT CHARSET = utf8mb4 COMMENT ='告警规则表'; */
 
 -- 10. 文件管理表
 DROP TABLE IF EXISTS `files`;
@@ -267,9 +267,8 @@ CREATE TABLE `refresh_tokens` (
 SET FOREIGN_KEY_CHECKS = 1;
 
 SELECT * FROM users;
-SELECT * FROM job_schedulers;
+/* SELECT * FROM job_schedulers; */
 SELECT * FROM clusters;
-/* DELETE FROM clusters WHERE cluster_name = 'lenovo'; */
 SELECT * FROM nodes;
 SELECT * FROM node_queues;
 SELECT * FROM queues;
@@ -278,7 +277,7 @@ SELECT * FROM apps;
 SELECT * FROM cluster_users;
 SELECT * FROM jobs;
 SELECT * FROM alerts;
-SELECT * FROM alert_rules;
+/* SELECT * FROM alert_rules; */
 SELECT * FROM devices;
 SELECT * FROM user_sessions;
 SELECT * FROM refresh_tokens;

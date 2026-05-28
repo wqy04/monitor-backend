@@ -9,6 +9,7 @@ D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\config
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\dto\Result.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\UserService.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\mapper\ClusterUserMapper.java
+D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\SlurmAdapter.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\entity\DeviceMonitor.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\NodeMonitorServiceImpl.java
 D:\vscode\bishe\backend\monitor-backend\src\main\java\com\example\monitor\service\impl\PromQueryServiceImpl.java

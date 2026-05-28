@@ -6,7 +6,6 @@ import com.example.monitor.entity.NodeMonitor;
 import com.example.monitor.service.ClusterService;
 import com.example.monitor.service.NodeMonitorService;
 import com.example.monitor.service.PromQueryService;
-import com.example.monitor.service.PromQueryService;
 import com.example.monitor.utils.RestTemplateUtils;
 import com.example.monitor.entity.prometheus.PromQueryData;
 import com.example.monitor.entity.prometheus.PromQueryResult;
@@ -17,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
-import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,61 +35,21 @@ public class ClusterController {
     @Autowired
     private RestTemplateUtils restTemplateUtils;
 
-    // 定义与数据库静态字段重复的 Prometheus 指标键名（节点维度）
+    // 排除的静态指标键名
     private static final Set<String> EXCLUDED_NODE_KEYS = Set.of(
-        "mem_total_bytes",   // 对应数据库 memoryTotal
-        "cpu_cores",         // 对应数据库 cpuTotal
-        "slots_max",         // 最大作业槽，数据库无直接对应但通常等于 cpuTotal，为避免冗余排除
-        "gpu_total",         // 对应数据库 gpuCount
-        "model_info"         // 静态型号信息，无变化
+        "mem_total_bytes", "cpu_cores", "slots_max", "gpu_total", "model_info"
     );
 
-    // 定义与数据库静态字段重复的 GPU 指标键名
-    private static final Set<String> EXCLUDED_GPU_KEYS = Set.of(
-        "mem_total_bytes"    // 对应数据库 gpuMemoryTotal（单卡显存）
-    );
+    private static final Set<String> EXCLUDED_GPU_KEYS = Set.of("mem_total_bytes");
 
+    // ==================== 集群列表接口 ====================
     @GetMapping("/clusters")
     public Result<Map<String, Object>> listClusters() {
         List<Cluster> clusters = clusterService.list();
         List<NodeMonitor> allNodes = nodeMonitorService.list();
 
-        // 查询 Prometheus 中所有 jingxing_node_* 指标，解析 status/slots_used/cpu_util/mem_free
-        Map<String, Map<String, Object>> promNodeMap = new HashMap<>();
-        PromQueryData allNodeMetrics = promQueryService.getQueryDataInfo("{__name__=~\"jingxing_node_.*\"}", null);
-        if (allNodeMetrics != null && allNodeMetrics.getResult() != null) {
-            for (PromQueryResult res : allNodeMetrics.getResult()) {
-                Map<String, Object> labels = res.getMetric();
-                String host = labels.get("host") != null ? labels.get("host").toString() : null;
-                if (host == null) continue;
-                String metricName = labels.get("__name__") != null ? labels.get("__name__").toString() : null;
-                if (metricName == null || !metricName.startsWith("jingxing_node_")) continue;
-                String key = metricName.substring("jingxing_node_".length());
-                List<String> valueList = res.getValue();
-                if (valueList == null || valueList.size() < 2) continue;
-                double val;
-                try {
-                    val = Double.parseDouble(valueList.get(1));
-                } catch (NumberFormatException e) {
-                    continue;
-                }
-                Map<String, Object> nodeInfo = promNodeMap.computeIfAbsent(host, k -> new HashMap<>());
-                if ("status".equals(key)) {
-                    String statusLabel = labels.get("status") != null ? labels.get("status").toString() : null;
-                    if (statusLabel != null) {
-                        nodeInfo.put("status", statusLabel);
-                    } else {
-                        nodeInfo.put("status", val == 1.0 ? "ok" : "unavail");
-                    }
-                } else if ("slots_used".equals(key)) {
-                    nodeInfo.put("slotsUsed", val);
-                } else if ("cpu_util_percent".equals(key)) {
-                    nodeInfo.put("cpuUtil", val);
-                } else if ("mem_free_bytes".equals(key)) {
-                    nodeInfo.put("memFree", val);
-                }
-            }
-        }
+        // 查询所有节点的动态数据（景行 + Slurm）
+        Map<String, Map<String, Object>> promNodeMap = fetchAllNodeDynamicData();
 
         // 统计每个集群的节点总数
         Map<Integer, Long> clusterNodeCount = allNodes.stream()
@@ -108,8 +65,8 @@ public class ClusterController {
         long totalNodeCount = 0;
         long totalOnlineCount = 0;
         long totalOfflineCount = 0;
-        long totalMemoryTotal = 0;   // 字节
-        double totalMemoryFree = 0.0; // 字节
+        long totalMemoryTotal = 0;
+        double totalMemoryFree = 0.0;
         double totalCpuUtilWeighted = 0.0;
         long totalCpuCoresForUtil = 0;
 
@@ -125,53 +82,48 @@ public class ClusterController {
             double slotsUsedSum = 0.0;
             long onlineCount = 0;
             long offlineCount = 0;
-            long memTotalSumBytes = 0;      // 改为字节
-            double memFreeSumBytes = 0.0;   // 字节
+            long memTotalSumBytes = 0;
+            double memFreeSumBytes = 0.0;
             double cpuUtilWeightedSum = 0.0;
             long cpuCoresForUtil = 0;
 
             for (NodeMonitor node : clusterNodes) {
                 long cpuCores = node.getCpuTotal() == null ? 0L : node.getCpuTotal();
-                // 修复点：数据库内存单位为 MB，转换为字节
                 long memTotalMB = node.getMemoryTotal() == null ? 0L : node.getMemoryTotal();
                 long memTotalBytes = memTotalMB * 1024L * 1024L;
                 memTotalSumBytes += memTotalBytes;
                 cpuCoresForUtil += cpuCores;
 
-                // 累加静态指标
                 cpuSum += cpuCores;
                 gpuSum += node.getGpuCount() == null ? 0L : node.getGpuCount();
                 slotsMaxSum += node.getSlotsMax() == null ? 0L : node.getSlotsMax();
 
-                // 动态指标（从 Prometheus 获取）
                 Map<String, Object> dynamic = promNodeMap.get(node.getNodeName());
                 if (dynamic != null) {
                     String status = (String) dynamic.get("status");
                     if ("ok".equals(status)) {
                         onlineCount++;
                     } else {
-                        offlineCount++;   // 包含了 closed、unavail 等所有非 ok 状态
+                        offlineCount++;
                     }
-                    Object usedObj = dynamic.get("slotsUsed");
+                    Object usedObj = dynamic.get("slots_used");
                     if (usedObj != null) {
                         slotsUsedSum += ((Number) usedObj).doubleValue();
                     }
-                    Object cpuUtilObj = dynamic.get("cpuUtil");
+                    Object cpuUtilObj = dynamic.get("cpu_util_percent");
                     if (cpuUtilObj != null) {
                         double cpuUtil = ((Number) cpuUtilObj).doubleValue();
                         cpuUtilWeightedSum += cpuUtil * cpuCores;
                     }
-                    Object memFreeObj = dynamic.get("memFree");
+                    Object memFreeObj = dynamic.get("mem_free_bytes");
                     if (memFreeObj != null) {
                         memFreeSumBytes += ((Number) memFreeObj).doubleValue();
                     }
                 } else {
-                    // 无监控数据的节点视为离线
                     offlineCount++;
                 }
             }
 
-            // 累加全局统计
             totalCpuCores += cpuSum;
             totalGpuCount += gpuSum;
             totalSlotsMax += slotsMaxSum;
@@ -184,7 +136,6 @@ public class ClusterController {
             totalCpuUtilWeighted += cpuUtilWeightedSum;
             totalCpuCoresForUtil += cpuCoresForUtil;
 
-            // 构造集群对象
             Map<String, Object> item = new HashMap<>();
             item.put("clusterId", cluster.getClusterId());
             item.put("clusterName", cluster.getClusterName());
@@ -200,15 +151,22 @@ public class ClusterController {
             item.put("gpuCount", gpuSum);
             item.put("slotsMaxTotal", slotsMaxSum);
             item.put("slotsUsedTotal", slotsUsedSum);
-            item.put("cpuUtilAvg", cpuCoresForUtil > 0 ? cpuUtilWeightedSum / cpuCoresForUtil : 0.0);
-            // 内存单位统一为字节（与 memFree 一致）
+
+            // 关键修改：当没有在线节点时，利用率相关字段返回 null
+            if (onlineCount == 0) {
+                item.put("cpuUtilAvg", null);
+                item.put("memoryFreeTotal", null);
+            } else {
+                double cpuAvg = cpuCoresForUtil > 0 ? cpuUtilWeightedSum / cpuCoresForUtil : 0.0;
+                item.put("cpuUtilAvg", cpuAvg);
+                item.put("memoryFreeTotal", memFreeSumBytes);
+            }
+
             item.put("memoryTotal", memTotalSumBytes);
-            item.put("memoryFreeTotal", memFreeSumBytes);
 
             clusterList.add(item);
         }
 
-        // 全局汇总
         Map<String, Object> summary = new HashMap<>();
         summary.put("totalClusterCount", totalClusterCount);
         summary.put("totalNodeCount", totalNodeCount);
@@ -229,6 +187,7 @@ public class ClusterController {
         return Result.ok(resultData);
     }
 
+    // ==================== 集群详情接口 ====================
     @GetMapping("/clusters/{clusterId}")
     public Result<Map<String, Object>> getCluster(@PathVariable Integer clusterId) {
         Cluster cluster = clusterService.getById(clusterId);
@@ -257,6 +216,7 @@ public class ClusterController {
         return Result.ok(item);
     }
 
+    // ==================== 集群节点列表接口 ====================
     @GetMapping("/clusters/{clusterId}/nodes")
     public Result<Map<String, Object>> getClusterNodes(@PathVariable Integer clusterId) {
         Cluster cluster = clusterService.getById(clusterId);
@@ -266,7 +226,8 @@ public class ClusterController {
         List<NodeMonitor> nodes = nodeMonitorService.list().stream()
                 .filter(n -> Objects.equals(n.getClusterId(), clusterId))
                 .collect(Collectors.toList());
-        Map<String, Map<String, Object>> promNodeMap = fetchPrometheusNodeInfo();
+
+        Map<String, Map<String, Object>> promNodeMap = fetchAllNodeDynamicData();
 
         List<Map<String, Object>> nodeList = new ArrayList<>();
         for (NodeMonitor node : nodes) {
@@ -290,10 +251,27 @@ public class ClusterController {
             item.put("powerMetricName", node.getPowerMetricName());
             item.put("clusterId", node.getClusterId());
 
-            // 动态字段（来自 Prometheus，已过滤冗余）
+            // 动态字段（来自 Prometheus）
             Map<String, Object> dynamic = promNodeMap.get(node.getNodeName());
             if (dynamic != null) {
-                item.putAll(dynamic);
+                if (dynamic.containsKey("cpu_util_percent")) {
+                    item.put("cpuUtilPercent", dynamic.get("cpu_util_percent"));
+                }
+                if (dynamic.containsKey("mem_free_bytes")) {
+                    item.put("memFreeBytes", dynamic.get("mem_free_bytes"));
+                }
+                if (dynamic.containsKey("slots_used")) {
+                    item.put("slotsUsed", dynamic.get("slots_used"));
+                }
+                if (dynamic.containsKey("status")) {
+                    item.put("status", dynamic.get("status"));
+                }
+                // 其他字段（如 GPU 指标）直接放入
+                dynamic.forEach((k, v) -> {
+                    if (!k.equals("cpu_util_percent") && !k.equals("mem_free_bytes") && !k.equals("slots_used") && !k.equals("status")) {
+                        item.put(k, v);
+                    }
+                });
             }
 
             nodeList.add(item);
@@ -307,80 +285,7 @@ public class ClusterController {
         return Result.ok(data);
     }
 
-    private Map<String, Map<String, Object>> fetchPrometheusNodeInfo() {
-        Map<String, Map<String, Object>> result = new HashMap<>();
-
-        // 查询节点指标
-        PromQueryData nodeData = promQueryService.getQueryDataInfo("{__name__=~\"jingxing_node_.*\"}", null);
-        if (nodeData != null && nodeData.getResult() != null) {
-            for (PromQueryResult res : nodeData.getResult()) {
-                Map<String, Object> labels = res.getMetric();
-                String host = labels.get("host") != null ? labels.get("host").toString() : null;
-                if (host == null) continue;
-                String metric = labels.get("__name__") != null ? labels.get("__name__").toString() : null;
-                if (metric == null || !metric.startsWith("jingxing_node_")) continue;
-                String key = metric.substring("jingxing_node_".length());
-
-                // 跳过与数据库重复的冗余字段
-                if (EXCLUDED_NODE_KEYS.contains(key)) {
-                    continue;
-                }
-
-                List<String> valueList = res.getValue();
-                if (valueList != null && valueList.size() >= 2) {
-                    double value = Double.parseDouble(valueList.get(1));
-                    Map<String, Object> nodeDataMap = result.computeIfAbsent(host, k -> new HashMap<>());
-                    if ("status".equals(key)) {
-                        nodeDataMap.put(key, value == 1.0 ? "ok" : "unavail");
-                    } else {
-                        nodeDataMap.put(key, value);
-                    }
-                }
-            }
-        }
-
-        // 查询 GPU 指标
-        PromQueryData gpuData = promQueryService.getQueryDataInfo("{__name__=~\"jingxing_gpu_.*\"}", null);
-        if (gpuData != null && gpuData.getResult() != null) {
-            for (PromQueryResult res : gpuData.getResult()) {
-                Map<String, Object> labels = res.getMetric();
-                String host = labels.get("host") != null ? labels.get("host").toString() : null;
-                String gpuId = labels.get("gpu_id") != null ? labels.get("gpu_id").toString() : null;
-                if (host == null || gpuId == null) continue;
-                String metric = labels.get("__name__") != null ? labels.get("__name__").toString() : null;
-                if (metric == null || !metric.startsWith("jingxing_gpu_")) continue;
-                String key = metric.substring("jingxing_gpu_".length());
-
-                // 跳过与数据库重复的 GPU 冗余字段（如总显存）
-                if (EXCLUDED_GPU_KEYS.contains(key)) {
-                    continue;
-                }
-
-                List<String> valueList = res.getValue();
-                if (valueList != null && valueList.size() >= 2) {
-                    double value = Double.parseDouble(valueList.get(1));
-                    Map<String, Object> nodeDataMap = result.computeIfAbsent(host, k -> new HashMap<>());
-                    List<Map<String, Object>> gpuList = (List<Map<String, Object>>) nodeDataMap.computeIfAbsent("gpuMetrics", k -> new ArrayList<>());
-                    Map<String, Object> gpu = null;
-                    for (Map<String, Object> g : gpuList) {
-                        if (gpuId.equals(g.get("gpuIndex").toString())) {
-                            gpu = g;
-                            break;
-                        }
-                    }
-                    if (gpu == null) {
-                        gpu = new HashMap<>();
-                        gpu.put("gpuIndex", Integer.parseInt(gpuId));
-                        gpuList.add(gpu);
-                    }
-                    gpu.put(key, value);
-                }
-            }
-        }
-
-        return result;
-    }
-
+    // ==================== 单个节点详情接口 ====================
     @GetMapping("/clusters/{clusterId}/nodes/{nodeId}")
     public Result<Map<String, Object>> getClusterNode(@PathVariable Integer clusterId, @PathVariable Integer nodeId) {
         Cluster cluster = clusterService.getById(clusterId);
@@ -398,6 +303,7 @@ public class ClusterController {
         return Result.ok(data);
     }
 
+    // ==================== 集群历史指标接口 ====================
     @GetMapping("/clusters/{clusterId}/history")
     public Result<Map<String, Object>> getClusterHistory(
             @PathVariable Integer clusterId,
@@ -411,7 +317,10 @@ public class ClusterController {
             return Result.fail(404, "cluster not found");
         }
 
-        // 获取集群节点列表
+        // 判断集群类型（根据 vendor 或 prometheusJob）
+        boolean isSlurm = "Slurm".equalsIgnoreCase(cluster.getVendor())
+                || "slurm".equalsIgnoreCase(cluster.getPrometheusJob());
+
         List<NodeMonitor> nodes = nodeMonitorService.list().stream()
                 .filter(n -> Objects.equals(n.getClusterId(), clusterId))
                 .collect(Collectors.toList());
@@ -419,74 +328,52 @@ public class ClusterController {
             return Result.fail(404, "no nodes in cluster");
         }
 
-        // 1. 处理 range 参数（优先级低于显式的 start/end）
+        // 处理时间范围
         long nowSec = System.currentTimeMillis() / 1000;
         if (start == null && end == null && range != null) {
             switch (range) {
-                case "1h":
-                    start = nowSec - 3600;
-                    end = nowSec;
-                    break;
-                case "6h":
-                    start = nowSec - 6 * 3600;
-                    end = nowSec;
-                    break;
-                case "12h":
-                    start = nowSec - 12 * 3600;
-                    end = nowSec;
-                    break;
-                case "1d":
-                    start = nowSec - 24 * 3600;
-                    end = nowSec;
-                    break;
-                case "7d":
-                    start = nowSec - 7 * 24 * 3600;
-                    end = nowSec;
-                    break;
-                case "30d":
-                    start = nowSec - 30 * 24 * 3600;
-                    end = nowSec;
-                    break;
-                default:
-                    // 无效 range，使用默认 1h
-                    start = nowSec - 3600;
-                    end = nowSec;
+                case "1h": start = nowSec - 3600; end = nowSec; break;
+                case "6h": start = nowSec - 6 * 3600; end = nowSec; break;
+                case "12h": start = nowSec - 12 * 3600; end = nowSec; break;
+                case "1d": start = nowSec - 24 * 3600; end = nowSec; break;
+                case "7d": start = nowSec - 7 * 24 * 3600; end = nowSec; break;
+                case "30d": start = nowSec - 30 * 24 * 3600; end = nowSec; break;
+                default: start = nowSec - 3600; end = nowSec;
             }
         }
-
-        // 2. 默认 1 小时范围
-        if (start == null) {
-            start = nowSec - 3600;
-        }
-        if (end == null) {
-            end = nowSec;
-        }
+        if (start == null) start = nowSec - 3600;
+        if (end == null) end = nowSec;
         if (start >= end) {
             return Result.fail(400, "start must be less than end");
         }
 
         long durationSec = end - start;
-        // 3. 自动计算 step（控制最大返回点数，例如 400）
         final int MAX_POINTS = 400;
         int autoStep = (int) Math.max(1, durationSec / MAX_POINTS);
-        // 如果 step 未传或 <=0，使用自动 step；否则使用传入 step
         int finalStep = (step == null || step <= 0) ? autoStep : step;
 
         String startStr = String.valueOf(start);
         String endStr = String.valueOf(end);
         String stepStr = String.valueOf(finalStep);
 
-        // 构建 host 列表
         String hosts = nodes.stream()
                 .map(NodeMonitor::getNodeName)
                 .collect(Collectors.joining("|"));
 
-        // 指标查询
         Map<String, String> metricsQueries = new HashMap<>();
-        metricsQueries.put("cpuUtil", "avg(jingxing_node_cpu_util_percent{host=~\"" + hosts + "\"})");
-        metricsQueries.put("slotsUsed", "sum(jingxing_node_slots_used{host=~\"" + hosts + "\"})");
-        metricsQueries.put("memFree", "sum(jingxing_node_mem_free_bytes{host=~\"" + hosts + "\"})");
-
+        if (isSlurm) {
+            // Slurm 集群使用 host 标签，仅查询 CPU 和 Slot 相关指标
+            metricsQueries.put("cpuUtil",
+                    "avg((slurm_node_cpu_alloc{host=~\"" + hosts + "\"} / slurm_node_cpu_cores{host=~\"" + hosts + "\"}) * 100)");
+            metricsQueries.put("slotsUsed",
+                    "sum(slurm_node_cpu_alloc{host=~\"" + hosts + "\"})");
+            // 不再查询 memFree，因为指标不存在
+        } else {
+            // 景行集群原有 PromQL
+            metricsQueries.put("cpuUtil", "avg(jingxing_node_cpu_util_percent{host=~\"" + hosts + "\"})");
+            metricsQueries.put("slotsUsed", "sum(jingxing_node_slots_used{host=~\"" + hosts + "\"})");
+            metricsQueries.put("memFree", "sum(jingxing_node_mem_free_bytes{host=~\"" + hosts + "\"})");
+        }
         List<Map<String, Object>> metricsList = new ArrayList<>();
         for (Map.Entry<String, String> entry : metricsQueries.entrySet()) {
             String metricName = entry.getKey();
@@ -527,36 +414,11 @@ public class ClusterController {
 
     private String getUnitForMetric(String metricName) {
         switch (metricName) {
-            case "cpuUtil":
-                return "%";
-            case "slotsUsed":
-                return "count";
-            case "memFree":
-                return "bytes";
-            default:
-                return "";
+            case "cpuUtil": return "%";
+            case "slotsUsed": return "count";
+            case "memFree": return "bytes";
+            default: return "";
         }
-    }
-
-    private Map<String, Object> convertNodeSummary(NodeMonitor node) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("nodeId", node.getNodeId());
-        m.put("nodeName", node.getNodeName());
-        m.put("nodeIp", node.getNodeIp());
-        m.put("nodeRole", node.getNodeRole());
-        m.put("gpuCount", node.getGpuCount());
-        m.put("cpuTotal", node.getCpuTotal());
-        m.put("memoryTotal", node.getMemoryTotal());
-        m.put("status", "up");
-        m.put("cpuUsagePercent", 11.2);
-        m.put("memoryUsagePercent", 45.2);
-        m.put("diskUsagePercent", 38.0);
-        m.put("loadAvg", 1.2);
-        m.put("temperatureCelsius", 45.2);
-        m.put("powerWatts", 1250.5);
-        m.put("gpuUtilAvg", 87.5);
-        m.put("lastScrape", DateUtil.now());
-        return m;
     }
 
     private Map<String, Object> convertNodeStatic(NodeMonitor node) {
@@ -579,6 +441,7 @@ public class ClusterController {
         return m;
     }
 
+    // 模拟动态数据（实际应来自实时查询，此处仅用于单个节点接口示例）
     private Map<String, Object> buildDynamicNode(NodeMonitor node) {
         Map<String, Object> d = new HashMap<>();
         d.put("status", "up");
@@ -607,6 +470,160 @@ public class ClusterController {
         return d;
     }
 
+    // ==================== 动态数据获取核心方法 ====================
+    private Map<String, Map<String, Object>> fetchAllNodeDynamicData() {
+        Map<String, Map<String, Object>> allNodes = new HashMap<>();
+        allNodes.putAll(fetchJingxingNodeInfo());
+        allNodes.putAll(fetchSlurmNodeInfo());
+        return allNodes;
+    }
+
+    /**
+     * 景行集群节点动态指标
+     */
+    private Map<String, Map<String, Object>> fetchJingxingNodeInfo() {
+        Map<String, Map<String, Object>> result = new HashMap<>();
+
+        PromQueryData nodeData = promQueryService.getQueryDataInfo("{__name__=~\"jingxing_node_.*\"}", null);
+        if (nodeData != null && nodeData.getResult() != null) {
+            for (PromQueryResult res : nodeData.getResult()) {
+                Map<String, Object> labels = res.getMetric();
+                String host = labels.get("host") != null ? labels.get("host").toString() : null;
+                if (host == null) continue;
+                String metric = labels.get("__name__") != null ? labels.get("__name__").toString() : null;
+                if (metric == null || !metric.startsWith("jingxing_node_")) continue;
+                String key = metric.substring("jingxing_node_".length());
+                if (EXCLUDED_NODE_KEYS.contains(key)) continue;
+
+                List<String> valueList = res.getValue();
+                if (valueList != null && valueList.size() >= 2) {
+                    double value = Double.parseDouble(valueList.get(1));
+                    Map<String, Object> nodeMap = result.computeIfAbsent(host, k -> new HashMap<>());
+                    if ("status".equals(key)) {
+                        nodeMap.put(key, value == 1.0 ? "ok" : "unavail");
+                    } else {
+                        nodeMap.put(key, value);
+                    }
+                }
+            }
+        }
+
+        // 查询 GPU 指标
+        PromQueryData gpuData = promQueryService.getQueryDataInfo("{__name__=~\"jingxing_gpu_.*\"}", null);
+        if (gpuData != null && gpuData.getResult() != null) {
+            for (PromQueryResult res : gpuData.getResult()) {
+                Map<String, Object> labels = res.getMetric();
+                String host = labels.get("host") != null ? labels.get("host").toString() : null;
+                String gpuId = labels.get("gpu_id") != null ? labels.get("gpu_id").toString() : null;
+                if (host == null || gpuId == null) continue;
+                String metric = labels.get("__name__") != null ? labels.get("__name__").toString() : null;
+                if (metric == null || !metric.startsWith("jingxing_gpu_")) continue;
+                String key = metric.substring("jingxing_gpu_".length());
+                if (EXCLUDED_GPU_KEYS.contains(key)) continue;
+
+                List<String> valueList = res.getValue();
+                if (valueList != null && valueList.size() >= 2) {
+                    double value = Double.parseDouble(valueList.get(1));
+                    Map<String, Object> nodeMap = result.computeIfAbsent(host, k -> new HashMap<>());
+                    List<Map<String, Object>> gpuList = (List<Map<String, Object>>) nodeMap.computeIfAbsent("gpuMetrics", k -> new ArrayList<>());
+                    Map<String, Object> gpu = null;
+                    for (Map<String, Object> g : gpuList) {
+                        if (gpuId.equals(g.get("gpuIndex").toString())) {
+                            gpu = g;
+                            break;
+                        }
+                    }
+                    if (gpu == null) {
+                        gpu = new HashMap<>();
+                        gpu.put("gpuIndex", Integer.parseInt(gpuId));
+                        gpuList.add(gpu);
+                    }
+                    gpu.put(key, value);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Slurm 集群节点动态指标（修复标签名 host）
+     */
+    private Map<String, Map<String, Object>> fetchSlurmNodeInfo() {
+        Map<String, Map<String, Object>> slurmNodes = new HashMap<>();
+
+        // 查询所需指标的最新值（使用 host 标签）
+        PromQueryData cpuCoresData = promQueryService.getQueryDataInfo("slurm_node_cpu_cores", null);
+        PromQueryData cpuAllocData = promQueryService.getQueryDataInfo("slurm_node_cpu_alloc", null);
+        PromQueryData memFreeData = promQueryService.getQueryDataInfo("slurm_node_mem_free_bytes", null);
+        PromQueryData nodeUpData = promQueryService.getQueryDataInfo("slurm_node_up", null);
+
+        // 辅助函数：将 PromQueryData 转为 Map<节点名, 数值>，标签使用 "host"
+        Function<PromQueryData, Map<String, Double>> toNodeValueMap = (data) -> {
+            Map<String, Double> map = new HashMap<>();
+            if (data != null && data.getResult() != null) {
+                for (PromQueryResult res : data.getResult()) {
+                    Map<String, Object> labels = res.getMetric();
+                    String host = labels.get("host") != null ? labels.get("host").toString() : null;
+                    if (host == null) continue;
+                    List<String> values = res.getValue();
+                    if (values != null && values.size() >= 2) {
+                        try {
+                            double val = Double.parseDouble(values.get(1));
+                            map.put(host, val);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
+            }
+            return map;
+        };
+
+        Map<String, Double> cpuCoresMap = toNodeValueMap.apply(cpuCoresData);
+        Map<String, Double> cpuAllocMap = toNodeValueMap.apply(cpuAllocData);
+        Map<String, Double> memFreeMap = toNodeValueMap.apply(memFreeData);
+        Map<String, Double> nodeUpMap = toNodeValueMap.apply(nodeUpData);
+
+        // 收集所有出现的节点名
+        Set<String> allNodes = new HashSet<>();
+        allNodes.addAll(cpuCoresMap.keySet());
+        allNodes.addAll(cpuAllocMap.keySet());
+        allNodes.addAll(memFreeMap.keySet());
+        allNodes.addAll(nodeUpMap.keySet());
+
+        for (String node : allNodes) {
+            Map<String, Object> dynamic = new HashMap<>();
+
+            // 1. 节点状态
+            Double up = nodeUpMap.get(node);
+            if (up != null && up == 1.0) {
+                dynamic.put("status", "ok");
+            } else {
+                dynamic.put("status", "unavail");
+            }
+
+            // 2. 已用作业槽
+            Double alloc = cpuAllocMap.get(node);
+            dynamic.put("slots_used", alloc != null ? alloc : 0.0);
+
+            // 3. CPU 利用率 (alloc / cores * 100)
+            Double cores = cpuCoresMap.get(node);
+            if (cores != null && cores > 0 && alloc != null) {
+                double cpuUtil = (alloc / cores) * 100.0;
+                dynamic.put("cpu_util_percent", cpuUtil);
+            } else {
+                dynamic.put("cpu_util_percent", 0.0);
+            }
+
+            // 4. 空闲内存
+            Double freeMem = memFreeMap.get(node);
+            dynamic.put("mem_free_bytes", freeMem != null ? freeMem : 0.0);
+
+            slurmNodes.put(node, dynamic);
+        }
+
+        return slurmNodes;
+    }
+
+    // ==================== 辅助方法 ====================
     private Map<Integer, JSONObject> fetchPrometheusClusterInfo() {
         Map<Integer, JSONObject> map = new HashMap<>();
         try {
@@ -614,10 +631,7 @@ public class ClusterController {
             if (targetJson != null) {
                 JSONObject body = JSONObject.parseObject(targetJson);
                 if ("success".equals(body.getString("status"))) {
-                    // 解析部分信息
-                    // 这里只作示范，用实际数据可扩展
-                    JSONArray jobs = body.getJSONObject("data").getJSONArray("yaml");
-                    // 暂不解析具体节点，返回空
+                    // 可解析 target 信息，此处留空或按需实现
                 }
             }
         } catch (Exception ignored) {
