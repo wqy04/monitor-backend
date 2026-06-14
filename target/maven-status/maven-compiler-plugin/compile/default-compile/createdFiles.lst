@@ -8,8 +8,12 @@ com\example\monitor\util\JwtUtil.class
 com\example\monitor\entity\prometheus\PromQueryRangeResult.class
 com\example\monitor\service\DataInitializer.class
 com\example\monitor\service\QueueService.class
+com\example\monitor\dto\UserPrometheusData.class
 com\example\monitor\entity\JobMonitor.class
 com\example\monitor\service\UserSessionService.class
+com\example\monitor\service\impl\FileManageServiceImpl.class
+com\example\monitor\service\PrometheusService.class
+com\example\monitor\controller\QueueController.class
 com\example\monitor\entity\Gpu.class
 com\example\monitor\service\FileManageService.class
 com\example\monitor\service\impl\NodeMonitorServiceImpl.class
@@ -19,6 +23,7 @@ com\example\monitor\service\NodeQueueService.class
 com\example\monitor\service\impl\PromSeriesServiceImpl.class
 com\example\monitor\entity\prometheus\PromQueryRangeData.class
 com\example\monitor\service\ClusterService.class
+com\example\monitor\service\SlurmAdapter.class
 com\example\monitor\service\AuthService.class
 com\example\monitor\entity\App.class
 com\example\monitor\service\ClusterUserService.class
@@ -36,6 +41,7 @@ com\example\monitor\mapper\UserSessionMapper.class
 com\example\monitor\mapper\NodeQueueMapper.class
 com\example\monitor\entity\prometheus\PromQueryData.class
 com\example\monitor\util\TokenStore.class
+com\example\monitor\controller\UserController.class
 com\example\monitor\entity\UserSession.class
 com\example\monitor\entity\prometheus\PromQueryResponse.class
 com\example\monitor\entity\RefreshToken.class
@@ -43,7 +49,11 @@ com\example\monitor\entity\NodeMonitor.class
 com\example\monitor\service\impl\AppServiceImpl.class
 com\example\monitor\controller\FileController.class
 com\example\monitor\service\impl\PromQueryServiceImpl.class
+com\example\monitor\controller\AppController.class
 com\example\monitor\entity\AlertRule.class
+com\example\monitor\controller\NodeController.class
+com\example\monitor\service\impl\QueueInfoServiceImpl.class
+com\example\monitor\config\WebConfig.class
 com\example\monitor\service\impl\AlertRuleServiceImpl.class
 com\example\monitor\service\impl\AlarmInfoServiceImpl.class
 com\example\monitor\mapper\ClusterUserMapper.class
@@ -57,6 +67,7 @@ com\example\monitor\service\impl\DeviceMonitorServiceImpl.class
 com\example\monitor\config\MybatisPlusConfig.class
 com\example\monitor\service\impl\UserServiceImpl.class
 com\example\monitor\entity\AlarmInfo.class
+com\example\monitor\dto\UserPrometheusData$UserData.class
 com\example\monitor\mapper\JobMonitorMapper.class
 com\example\monitor\mapper\ClusterMapper.class
 com\example\monitor\entity\NodeQueue.class
@@ -78,11 +89,13 @@ com\example\monitor\service\JobMonitorService.class
 com\example\monitor\MonitorApplication.class
 com\example\monitor\service\DeviceMonitorService.class
 com\example\monitor\controller\GlobalExceptionHandler.class
+com\example\monitor\dto\AppInfoDTO.class
 com\example\monitor\service\PromQueryService.class
 com\example\monitor\mapper\UserMapper.class
 com\example\monitor\controller\AlertController.class
 com\example\monitor\service\impl\JobMonitorServiceImpl.class
 com\example\monitor\service\impl\GpuServiceImpl.class
+com\example\monitor\service\QueueInfoService.class
 com\example\monitor\entity\Cluster.class
 com\example\monitor\service\AlarmInfoService.class
 com\example\monitor\service\UserService.class

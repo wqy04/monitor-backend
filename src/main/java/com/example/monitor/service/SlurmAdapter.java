@@ -22,6 +22,9 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class SlurmAdapter implements ClusterMetadataAdapter {
+    static {
+        System.out.println("========== SlurmAdapter 类被加载 ==========");
+    }
 
     private static final long BYTES_TO_MB = 1024 * 1024;
     // 节点名模式匹配
@@ -35,7 +38,8 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
      */
     @Override
     public boolean supports(PromQueryService promQueryService) {
-        PromQueryData data = promQueryService.getQueryDataInfo("slurm_node_cpu_total", null);
+        System.out.println("SlurmAdapter.supports 被调用");
+        PromQueryData data = promQueryService.getQueryDataInfo("slurm_node_up", null);
         return data != null && !CollectionUtils.isEmpty(data.getResult());
     }
 
@@ -46,7 +50,7 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
     public List<Cluster> discoverClusters(PromQueryService promQueryService) {
         List<Cluster> clusters = new ArrayList<>();
         // 获取任意一个节点的 job 和 instance 作为集群标识
-        PromQueryData nodeData = promQueryService.getQueryDataInfo("slurm_node_cpu_total", null);
+        PromQueryData nodeData = promQueryService.getQueryDataInfo("slurm_node_cpu_cores", null);
         if (nodeData == null || CollectionUtils.isEmpty(nodeData.getResult())) {
             return clusters;
         }
@@ -74,9 +78,8 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
         List<NodeMonitor> nodes = new ArrayList<>();
 
         // 1. 获取节点 CPU 总数
-        Map<String, Integer> cpuTotalMap = queryNodeMetricMapInt(promQueryService, "slurm_node_cpu_total", "node");
-        // 2. 获取节点内存总数（MB）
-        Map<String, Long> memTotalMap = queryNodeMetricMapLong(promQueryService, "slurm_node_mem_total", "node");
+        Map<String, Integer> cpuTotalMap = queryNodeMetricMapInt(promQueryService, "slurm_node_cpu_cores", "host");
+        Map<String, Long> memTotalMap = queryNodeMetricMapLong(promQueryService, "slurm_node_mem_total_bytes", "host");
         // 3. 获取节点状态（用于后续告警，但节点实体中不存储状态）
         // 4. 遍历节点名（取 CPU 指标的节点集合）
         for (String nodeName : cpuTotalMap.keySet()) {
@@ -119,12 +122,12 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
     public List<Queue> discoverQueues(Cluster cluster, PromQueryService promQueryService) {
         List<Queue> queues = new ArrayList<>();
         // 获取分区总 CPU 指标（包含分区名）
-        PromQueryData partitionData = promQueryService.getQueryDataInfo("slurm_partition_cpus_total", null);
+        PromQueryData partitionData = promQueryService.getQueryDataInfo("slurm_queue_info", null);
         if (partitionData == null) return queues;
 
         for (PromQueryResult result : partitionData.getResult()) {
             Map<String, Object> metric = result.getMetric();
-            String partitionName = (String) metric.get("partition");
+            String partitionName = (String) metric.get("queue");
             if (!StringUtils.hasText(partitionName)) continue;
 
             Queue queue = new Queue();
@@ -146,12 +149,12 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
     public List<AlarmInfo> discoverAlerts(Cluster cluster, PromQueryService promQueryService) {
         List<AlarmInfo> alarms = new ArrayList<>();
         // 获取节点状态（可以从 slurm_node_cpu_total 的 status 标签获取）
-        PromQueryData nodeData = promQueryService.getQueryDataInfo("slurm_node_cpu_total", null);
+        PromQueryData nodeData = promQueryService.getQueryDataInfo("slurm_node_up", null);
         if (nodeData == null) return alarms;
 
         for (PromQueryResult result : nodeData.getResult()) {
             Map<String, Object> metric = result.getMetric();
-            String nodeName = (String) metric.get("node");
+            String nodeName = (String) metric.get("host");
             String status = (String) metric.get("status");
             if (nodeName == null) continue;
 
@@ -218,7 +221,7 @@ public class SlurmAdapter implements ClusterMetadataAdapter {
                                             Map<String, Integer> queueNameToIdMap) {
         List<NodeQueue> nodeQueues = new ArrayList<>();
         // 获取节点CPU核数（用于推断分区）
-        Map<String, Integer> nodeCpuMap = queryNodeMetricMapInt(promQueryService, "slurm_node_cpu_total", "node");
+        Map<String, Integer> nodeCpuMap = queryNodeMetricMapInt(promQueryService, "slurm_node_cpu_cores", "node");
         
         for (Map.Entry<String, Integer> entry : nodeCpuMap.entrySet()) {
             String nodeName = entry.getKey();
